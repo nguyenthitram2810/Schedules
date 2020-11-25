@@ -1,2 +1,3 @@
+include ':dragboardview'
 include ':app'
 rootProject.name = "Schedules"
