@@ -11,6 +11,14 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.huy3999.dragboardview.DragBoardView;
+import com.huy3999.dragboardview.model.DragColumn;
+import com.huy3999.dragboardview.model.DragItem;
+import com.huy3999.dragboardview.utils.AttrAboutPhone;
+import com.huy3999.schedules.adapter.ColumnAdapter;
+import com.huy3999.schedules.model.Entry;
+import com.huy3999.schedules.model.Item;
+
 public class MainActivity extends AppCompatActivity {
 //    private Button btn_logout;
     private FirebaseAuth auth;
