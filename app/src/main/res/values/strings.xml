@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Schedules</string>
+    <string name="facebook_app_id">137607131130942</string>
+    <string name="fb_login_protocol_scheme">fb137607131130942</string>
 </resources>

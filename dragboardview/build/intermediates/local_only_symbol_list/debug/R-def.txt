@@ -1,0 +1,10 @@
+R_DEF: Internal format may change without notice
+local
+attr? flingFactor
+attr? singlePageFling
+attr? triggerOffset
+id layout_main
+id rv_lists
+layout view_drag_board
+string app_name
+styleable RecyclerViewPager triggerOffset flingFactor singlePageFling
