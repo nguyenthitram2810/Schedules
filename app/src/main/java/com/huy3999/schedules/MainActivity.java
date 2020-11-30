@@ -8,7 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -21,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,22 +34,24 @@ import com.huy3999.dragboardview.model.DragColumn;
 import com.huy3999.dragboardview.model.DragItem;
 import com.huy3999.dragboardview.utils.AttrAboutPhone;
 import com.huy3999.schedules.adapter.ColumnAdapter;
+import com.huy3999.schedules.adapter.ProjectAdapter;
 import com.huy3999.schedules.model.Entry;
 import com.huy3999.schedules.model.Item;
+import com.huy3999.schedules.model.Project;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private ColumnAdapter mAdapter;
-    DragBoardView dragBoardView;
-    private List<DragColumn> mData = new ArrayList<>();
+    private FloatingActionButton btn_add_project;
+    private RecyclerView rv_projects;
+    private ProjectAdapter adapter;
+    private ArrayList<Project> arrProjects;
     private FirebaseAuth auth;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private NavigationView navigationView;
-//    Button btnE;
+    private static final int REQUEST_CODE_EXAMPLE = 0x9345;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -56,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         FirebaseApp.initializeApp(this);
         auth = FirebaseAuth.getInstance();
-        checkLogin();
+//        checkLogin();
 //        testExit();
 
         //Create a new toolbar
@@ -69,13 +75,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
-
-        dragBoardView = findViewById(R.id.layout_main);
-        mAdapter = new ColumnAdapter(this);
-        mAdapter.setData(mData);
-        dragBoardView.setHorizontalAdapter(mAdapter);
-        getDataAndRefreshView();
-
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -104,6 +103,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void mapping() {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        btn_add_project = findViewById(R.id.btn_add_project);
+        rv_projects = findViewById(R.id.list_project);
+        rv_projects.setLayoutManager(new LinearLayoutManager(this));
+        arrProjects = new ArrayList<Project>();
+        adapter = new ProjectAdapter(arrProjects, this);
+        rv_projects.setAdapter(adapter);
     }
 
 //    private void testExit() {
@@ -117,32 +122,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        });
 //    }
 
-    private void checkLogin() {
-        if(auth.getCurrentUser() == null){
-            //User da login roi
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        }
-    }
+//    private void checkLogin() {
+//        if(auth.getCurrentUser() == null){
+//            //User da login roi
+//            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+//        }
+//    }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         AttrAboutPhone.saveAttr(this);
         AttrAboutPhone.initScreen(this);
         super.onWindowFocusChanged(hasFocus);
-    }
-
-    private void getDataAndRefreshView() {
-        for (int i = 0; i < 3; i++) {
-            List<DragItem> itemList = new ArrayList<>();
-            for (int j = 0; j < 5; j++) {
-                itemList.add(new Item("entry " + i + " item id " + j, "item name " + j, "info " + j));
-            }
-            //mData.add(new Entry("entry id " + i, "name " + i, itemList));
-            mData.add(new Entry("entry 0","Todo",itemList));
-            mData.add(new Entry("entry 1","Doing",itemList));
-            mData.add(new Entry("entry 2","Done",itemList));
-        }
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -158,5 +149,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("CCC", "onNavigationItemSelected: " + id);
         drawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    public void onAddProject(View view) {
+        Intent i = new Intent(MainActivity.this, NewProject.class);
+        startActivityForResult(i, REQUEST_CODE_EXAMPLE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
