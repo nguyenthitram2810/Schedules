@@ -51,10 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private Button btnSignInGoogle;
-    private LoginButton btnSignInFb;
-    private CallbackManager mCallbackManager;
     private final String TAG = "Facebook";
-    private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +66,6 @@ public class LoginActivity extends AppCompatActivity {
 
         mapping();
         addEvents();
-        setUpLoginFB();
-        checkLogin();
     }
     @Override
     protected void onResume() {
@@ -84,89 +79,8 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
     }
-
-    private void setUpLoginFB() {
-        mCallbackManager = CallbackManager.Factory.create();
-        btnSignInFb.setPermissions(Arrays.asList("email", "public_profile"));
-        btnSignInFb.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "onSuccess: " + loginResult);
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "onCancel: ");
-                saveUserInfo(null);
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(TAG, "onError: " + error);
-                saveUserInfo(null);
-            }
-        });
-    }
-
-    private void handleFacebookAccessToken(AccessToken accessToken) {
-        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
-        auth.signInWithCredential(authCredential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            FirebaseUser firebaseUser = auth.getCurrentUser();
-                            Log.d(TAG, "onComplete: " + firebaseUser);
-                            saveUserInfo(firebaseUser);
-                            navigateToPlacesActivity();
-                        }else{
-                            Log.d(TAG, "onComplete: fail signInWithCredential");
-                            saveUserInfo(null);
-                        }
-                    }
-                });
-    }
-
-    private void navigateToPlacesActivity() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    public void saveUserInfo(FirebaseUser facebookUser){
-        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if(facebookUser != null){
-            String userId = facebookUser.getUid();
-            String email = facebookUser.getEmail();
-            String name = facebookUser.getDisplayName();
-            Uri photoUrl = facebookUser.getPhotoUrl();
-            editor.putString("userId", userId);
-            editor.putString("email", email);
-            editor.putString("name", name);
-            editor.putString("photoUrl", String.valueOf(photoUrl));
-            editor.putString("userType", "facebook");
-            editor.putInt("isLoggedIn", 1);
-        }else{
-            editor.putString("userId", "");
-            editor.putString("email", "");
-            editor.putString("name", "");
-            editor.putString("photoUrl", "");
-            editor.putString("userType", "");
-            editor.putInt("isLoggedIn", 0);
-        }
-        editor.commit();
-    }
-
-    private void checkLogin(){
-        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
-        if(sharedPreferences.getInt("isLoggedIn", 0) == 1){
-            navigateToPlacesActivity();
-        }
-    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -230,7 +144,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void mapping() {
         btnSignInGoogle = findViewById(R.id.button_login_gg);
-        btnSignInFb = findViewById(R.id.button_login_fb);
     }
 
 }
