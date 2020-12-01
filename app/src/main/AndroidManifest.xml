@@ -14,15 +14,17 @@
         android:theme="@style/AppTheme.NoActionBar">
         <activity android:name=".NewProject"></activity>
         <activity android:name=".MainActivity">
+
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"></activity> <!-- Settings for Facebook login -->
+        </activity> <!-- Settings for Facebook login -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />

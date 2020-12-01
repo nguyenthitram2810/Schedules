@@ -1,6 +1,8 @@
 package com.huy3999.schedules.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +38,8 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.tvName.setText(arrProjects.get(position).name);
         holder.tvCollaborators.setText(arrProjects.get(position).member.size() + " collaborators");
-        holder.itemProject.setBackgroundColor(arrProjects.get(position).color);
+        Log.d("DEBUGCOLOR", arrProjects.get(position).color);
+        holder.itemProject.setBackgroundColor(Color.parseColor("#" + arrProjects.get(position).color));
     }
 
     @Override
