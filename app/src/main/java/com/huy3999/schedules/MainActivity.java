@@ -100,11 +100,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onNext(List<Project> projects) {
-                        Log.d("DEBUG2", "no");
+                        arrProjects.removeAll(arrProjects);
                         for(Project project : projects) {
                             arrProjects.add(project);
                         }
-
                     }
 
                     @Override
@@ -178,5 +177,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        this.getData(auth.getCurrentUser().getEmail());
     }
 }
