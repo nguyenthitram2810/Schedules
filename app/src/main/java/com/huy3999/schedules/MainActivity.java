@@ -3,6 +3,7 @@ package com.huy3999.schedules;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
@@ -36,87 +38,72 @@ import com.huy3999.schedules.model.Item;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity{
 
     private ColumnAdapter mAdapter;
     DragBoardView dragBoardView;
     private List<DragColumn> mData = new ArrayList<>();
     private FirebaseAuth auth;
-    private DrawerLayout drawerLayout;
+    private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle toggle;
-    private NavigationView navigationView;
 //    Button btnE;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //TOOLBAR
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
         mapping();
+        NavigationView navigationView = findViewById(R.id.nav_view);
 
         FirebaseApp.initializeApp(this);
         auth = FirebaseAuth.getInstance();
         checkLogin();
 //        testExit();
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
 
-        //Create a new toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
-        drawerLayout.addDrawerListener(toggle);
-
-        //Add Button Navigation Drawer
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
-
+                        return true;
+                    }
+                });
+        //Huy
         dragBoardView = findViewById(R.id.layout_main);
         mAdapter = new ColumnAdapter(this);
         mAdapter.setData(mData);
         dragBoardView.setHorizontalAdapter(mAdapter);
         getDataAndRefreshView();
-
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
-    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onPostCreate(savedInstanceState, persistentState);
-        toggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        toggle.onConfigurationChanged(newConfig);
-    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 //        switch (item.getItemId()) {
 //            case android.R.id.home:
-//                drawerLayout.openDrawer(GravityCompat.START);
+//                mDrawerLayout.openDrawer(GravityCompat.START);
 //                return true;
 //        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
-    private void mapping() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        Log.d("oke", "onOptionsItemSelected: " + item.getItemId());
+        return super.onOptionsItemSelected(item);
     }
 
-//    private void testExit() {
-//        btnE = findViewById(R.id.exit);
-//        btnE.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                auth.signOut();
-//                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-//            }
-//        });
-//    }
+    private void mapping() {
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+    }
+
 
     private void checkLogin() {
         if(auth.getCurrentUser() == null){
@@ -145,19 +132,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         mAdapter.notifyDataSetChanged();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        Log.d("CCC", "onNavigationItemSelected: " + id);
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return false;
-    }
+    //    private void testExit() {
+//        btnE = findViewById(R.id.exit);
+//        btnE.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                auth.signOut();
+//                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+//            }
+//        });
+//    }
 }

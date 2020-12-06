@@ -31,8 +31,4 @@
         android:text="Truong Dat"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     </LinearLayout>
-    <com.google.android.material.navigation.NavigationView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/activity_main_drawer"/>
 </LinearLayout>
