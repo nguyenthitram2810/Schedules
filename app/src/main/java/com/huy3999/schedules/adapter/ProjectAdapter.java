@@ -38,8 +38,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.tvName.setText(arrProjects.get(position).name);
         holder.tvCollaborators.setText(arrProjects.get(position).member.size() + " collaborators");
-        Log.d("DEBUGCOLOR", arrProjects.get(position).color);
-        holder.itemProject.setBackgroundColor(Color.parseColor("#" + arrProjects.get(position).color));
+        holder.itemProject.setBackgroundColor(Color.parseColor(arrProjects.get(position).color));
     }
 
     @Override
