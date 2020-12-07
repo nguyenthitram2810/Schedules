@@ -10,6 +10,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface BaseApiService {
@@ -21,4 +22,10 @@ public interface BaseApiService {
 
     @DELETE("projects/deleteProject/{id}")
     Observable<String> deleteProject(@Path("id") String id);
+
+    @PUT("projects/updateProject/{id}")
+    Observable<String> updateProject(@Path("id") String id, @Body CreateProjectInfo project);
+
+    @GET("projects/getProject/{id}")
+    Observable<Project> getProject(@Path("id") String id);
 }

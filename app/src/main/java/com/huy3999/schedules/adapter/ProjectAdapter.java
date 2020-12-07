@@ -1,6 +1,7 @@
 package com.huy3999.schedules.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.huy3999.schedules.MainActivity;
+import com.huy3999.schedules.NewProject;
 import com.huy3999.schedules.R;
 import com.huy3999.schedules.apiservice.BaseApiService;
 import com.huy3999.schedules.apiservice.UtilsApi;
@@ -65,7 +68,9 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
                                 Toast.makeText(mContext, "view", Toast.LENGTH_SHORT).show();
                                 break;
                             case R.id.edit:
-                                Toast.makeText(mContext, "edit", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(mContext, NewProject.class);
+                                intent.putExtra("id", arrProjects.get(position).id);
+                                mContext.startActivity(intent);
                                 break;
                             case R.id.delete:
                                 mApiService.deleteProject(arrProjects.get(position).id)
