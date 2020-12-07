@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
+=======
+    <string name="app_name"/>
+>>>>>>> f0456a9ec80aabd02cba1db041884171aa1c8798
     <declare-styleable name="RecyclerViewPager">
         <attr format="float" name="triggerOffset"/>
         <attr format="float" name="flingFactor"/>

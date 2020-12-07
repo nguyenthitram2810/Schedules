@@ -1800,6 +1800,10 @@ int string abc_searchview_description_voice 0x0
 int string abc_shareactionprovider_share_with 0x0
 int string abc_shareactionprovider_share_with_application 0x0
 int string abc_toolbar_collapse_description 0x0
+<<<<<<< HEAD
+=======
+int string app_name 0x0
+>>>>>>> f0456a9ec80aabd02cba1db041884171aa1c8798
 int string appbar_scrolling_view_behavior 0x0
 int string bottom_sheet_behavior 0x0
 int string character_counter_content_description 0x0
