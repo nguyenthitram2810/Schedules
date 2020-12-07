@@ -25,7 +25,7 @@
             app:tint="@color/tomato"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center_vertical">
@@ -46,6 +46,20 @@
                 android:layout_marginLeft="6dp"
                 android:text="0 collaborators">
             </TextView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="right">
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:id="@+id/option"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24"
+                tools:ignore="VectorDrawableCompat"
+                app:tint="@color/black"
+                />
         </LinearLayout>
     </LinearLayout>
 
