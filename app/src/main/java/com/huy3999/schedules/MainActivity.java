@@ -116,11 +116,10 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(List<Project> projects) {
-                        Log.d("DEBUG2", "no");
+                        arrProjects.removeAll(arrProjects);
                         for(Project project : projects) {
                             arrProjects.add(project);
                         }
-
                     }
 
                     @Override
@@ -151,6 +150,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        AttrAboutPhone.saveAttr(this);
+        AttrAboutPhone.initScreen(this);
+        super.onWindowFocusChanged(hasFocus);
+    }
+
+    public void onAddProject(View view) {
+        Intent i = new Intent(MainActivity.this, NewProject.class);
+        startActivityForResult(i, REQUEST_CODE_EXAMPLE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        this.getData(auth.getCurrentUser().getEmail());
+    }
+}
+
 //    @Override
 //    public void onWindowFocusChanged(boolean hasFocus) {
 //        AttrAboutPhone.saveAttr(this);
@@ -167,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 //        super.onActivityResult(requestCode, resultCode, data);
 //    }
 
-}
+
 
 //    private void getDataAndRefreshView() {
 //        for (int i = 0; i < 3; i++) {
