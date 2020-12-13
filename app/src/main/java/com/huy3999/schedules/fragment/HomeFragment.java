@@ -48,6 +48,7 @@ public class HomeFragment extends Fragment {
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private AppBarConfiguration mAppBarConfiguration;
     private static View root;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 //        homeViewModel =
@@ -70,6 +71,7 @@ public class HomeFragment extends Fragment {
 //                textView.setText(s);
 //            }
 //        });
+        auth = FirebaseAuth.getInstance();
         btn_add_project = root.findViewById(R.id.btn_add_project);
         rv_projects = root.findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -77,6 +79,7 @@ public class HomeFragment extends Fragment {
         arrProjects = new ArrayList<Project>();
         adapter = new ProjectAdapter(arrProjects, getContext());
         rv_projects.setAdapter(adapter);
+        getData(auth.getCurrentUser().getEmail());
         return root;
     }
     public void getData(String email) {

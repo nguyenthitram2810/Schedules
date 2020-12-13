@@ -98,7 +98,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
 
                                             }
                                         });
-                                Toast.makeText(mContext, "delete", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Delete successfully", Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         return false;
