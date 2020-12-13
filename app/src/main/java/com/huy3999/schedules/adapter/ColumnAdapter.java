@@ -1,30 +1,35 @@
 package com.huy3999.schedules.adapter;
-
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.huy3999.dragboardview.adapter.HorizontalAdapter;
 import com.huy3999.dragboardview.model.DragColumn;
 import com.huy3999.dragboardview.model.DragItem;
+import com.huy3999.schedules.MainActivity;
 import com.huy3999.schedules.R;
 import com.huy3999.schedules.model.Entry;
+import com.huy3999.schedules.model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder> {
-
+public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  {
     public ColumnAdapter(Context context) {
         super(context);
     }
@@ -61,39 +66,16 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder> {
 
         final Entry entry = (Entry) dragColumn;
         holder.tv_title.setText(entry.getName());
-        final List<DragItem> itemList = entry.getItemList();
+        List<DragItem> itemList = entry.getItemList();
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         holder.rv_item.setLayoutManager(layoutManager);
-        final ItemAdapter itemAdapter = new ItemAdapter(mContext, dragHelper);
+        ItemAdapter itemAdapter = new ItemAdapter(mContext, dragHelper);
         itemAdapter.setData(itemList);
         holder.rv_item.setAdapter(itemAdapter);
         holder.add_task.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                new AlertDialog().Builder(mContext)
-//                        .content("添加一个卡片")
-//                        .positiveText("添加")
-//                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-//                            @Override
-//                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                // add new Item instantly
-//                                itemList.add(new Item(
-//                                        "entry " + " item id ",
-//                                        "item name : new Item",
-//                                        "info : new Item"));
-//                                itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
-//                                // then add new Item to your database in io thread
-//                                // then view will auto-refresh
-//                            }
-//                        })
-//                        .negativeText("取消")
-//                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-//                            @Override
-//                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                dialog.dismiss();
-//                            }
-//                        })
-//                        .show();
+                openDialog(itemList,itemAdapter,position);
             }
         });
     }
@@ -127,6 +109,7 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder> {
             }
         });
     }
+
 
     public class ViewHolder extends HorizontalAdapter.ViewHolder {
 
@@ -168,6 +151,43 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder> {
             btn_ok = convertView.findViewById(R.id.add_ok);
             editText = convertView.findViewById(R.id.add_et);
         }
+    }
+    private void openDialog(List<DragItem> itemList, ItemAdapter itemAdapter,final int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_item, null);
+        //View view = getLayoutInflater().inflate(R.layout.test, null);
+        EditText edtItemName = view.findViewById(R.id.edtItemName);
+        EditText edtItemDes = view.findViewById(R.id.edtItemDes);
+        final AlertDialog alertDialog = builder.create();
+        builder.setMessage("Add item")
+                .setView(view)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
+                            String itemName = edtItemName.getText().toString().trim();
+                            String itemDes = edtItemDes.getText().toString().trim();
+//                            itemList.add(new Item(
+//                                        "entry " + " item id ",
+//                                        "item name : "+itemName,
+//                                        "info : "+itemDes));
+                            itemList.add(new Item(
+                                    "entry " + " item id ",
+                                    itemName,
+                                    itemDes));
+                                itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
+
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        alertDialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 }
 

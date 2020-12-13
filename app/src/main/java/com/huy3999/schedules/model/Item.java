@@ -3,9 +3,18 @@ package com.huy3999.schedules.model;
 import com.huy3999.dragboardview.model.DragItem;
 
 public class Item implements DragItem {
-    private final String itemId;
-    private final String itemName;
-    private final String info;
+    private String itemId;
+    private String itemName;
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    private String info;
 
     public Item(String itemId, String itemName, String info) {
         this.itemId = itemId;
@@ -23,6 +32,9 @@ public class Item implements DragItem {
 
     public String getInfo() {
         return info;
+    }
+    public void setItemName(String itemName){
+        this.itemName = itemName;
     }
 
     @Override

@@ -6,8 +6,5 @@ attr? triggerOffset
 id layout_main
 id rv_lists
 layout view_drag_board
-<<<<<<< HEAD
-=======
 string app_name
->>>>>>> f0456a9ec80aabd02cba1db041884171aa1c8798
 styleable RecyclerViewPager triggerOffset flingFactor singlePageFling
