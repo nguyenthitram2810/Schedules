@@ -3,11 +3,16 @@ package com.huy3999.schedules;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,45 +55,56 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+public class MainActivity extends AppCompatActivity {
     private FloatingActionButton btn_add_project;
     private RecyclerView rv_projects;
     private ProjectAdapter adapter;
     private ArrayList<Project> arrProjects;
     private FirebaseAuth auth;
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle toggle;
-    private NavigationView navigationView;
     private BaseApiService mApiService;
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
+    private AppBarConfiguration mAppBarConfiguration;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mapping();
+        //mapping();
 
         FirebaseApp.initializeApp(this);
         auth = FirebaseAuth.getInstance();
         checkLogin();
 
-        //Create a new toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
-        drawerLayout.addDrawerListener(toggle);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_settings, R.id.nav_logout)
+                .setDrawerLayout(drawer)
+                .build();
 
-        //Add Button Navigation Drawer
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
-        navigationView.setNavigationItemSelectedListener(this);
-        getData(auth.getCurrentUser().getEmail());
-
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
     public void getData(String email) {
         mApiService.getAllProjects(email)
                 .subscribeOn(Schedulers.newThread())
@@ -116,22 +132,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
     }
-    @Override
-    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onPostCreate(savedInstanceState, persistentState);
-        toggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        toggle.onConfigurationChanged(newConfig);
-    }
-
 
     private void mapping() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
         btn_add_project = findViewById(R.id.btn_add_project);
         rv_projects = findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(this));
@@ -148,26 +150,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         AttrAboutPhone.saveAttr(this);
         AttrAboutPhone.initScreen(this);
         super.onWindowFocusChanged(hasFocus);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        Log.d("CCC", "onNavigationItemSelected: " + id);
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return false;
     }
 
     public void onAddProject(View view) {
@@ -180,3 +168,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.getData(auth.getCurrentUser().getEmail());
     }
 }
+
+//    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        AttrAboutPhone.saveAttr(this);
+//        AttrAboutPhone.initScreen(this);
+//        super.onWindowFocusChanged(hasFocus);
+//    }
+//
+//    public void onAddProject(View view) {
+//        Intent i = new Intent(MainActivity.this, NewProject.class);
+//        startActivityForResult(i, REQUEST_CODE_EXAMPLE);
+//    }
+//
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
+
+
+
+//    private void getDataAndRefreshView() {
+//        for (int i = 0; i < 3; i++) {
+//            List<DragItem> itemList = new ArrayList<>();
+//            for (int j = 0; j < 5; j++) {
+//                itemList.add(new Item("entry " + i + " item id " + j, "item name " + j, "info " + j));
+//            }
+//            //mData.add(new Entry("entry id " + i, "name " + i, itemList));
+//            mData.add(new Entry("entry 0","Todo",itemList));
+//            mData.add(new Entry("entry 1","Doing",itemList));
+//            mData.add(new Entry("entry 2","Done",itemList));
+//        }
+//        mAdapter.notifyDataSetChanged();
+//    }
+//    private void testExit() {
+//        btnE = findViewById(R.id.exit);
+//        btnE.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                auth.signOut();
+//                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+//            }
+//        });
+//    }
