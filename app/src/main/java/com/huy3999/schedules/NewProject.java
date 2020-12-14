@@ -74,6 +74,7 @@ public class NewProject extends AppCompatActivity {
     private FirebaseAuth auth;
     private String id = null;
     private String deletedCollaborator = null;
+    private String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -206,14 +207,11 @@ public class NewProject extends AppCompatActivity {
                 .setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
                     @Override
                     public void onChooseColor(int position, int color) {
-                        if(color == 0) {
-                            color_project.setText("No color");
-                        }
-                        else {
+                        if(color != 0) {
                             color_project.setText("");
+                            color_project.setBackgroundColor(color);
+                            color_choosed = colors.get(position);
                         }
-                        color_project.setBackgroundColor(color);
-                        color_choosed = colors.get(position);
                     }
 
                     @Override
@@ -253,15 +251,22 @@ public class NewProject extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                arrCollaborators.add(add_colla.getText().toString());
-                if(arrCollaborators.size() > 0) {
-                    no_collaborator.setText(arrCollaborators.size() + " collaborators");
+                try {
+                    String email = add_colla.getText().toString().trim();
+
+                    if(email.equals(auth.getCurrentUser().getEmail())) throw new Exception("You can not invite yourself");
+                    if(!email.matches(emailPattern)) throw new Exception("Email is invalid");
+                    if(!email.isEmpty()) {
+                        arrCollaborators.add(email);
+                        no_collaborator.setText(arrCollaborators.size() + " collaborators");
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    dialog.dismiss();
                 }
-                else {
-                    no_collaborator.setText("0 collaborators");
+                catch (Exception e) {
+                    Toast.makeText(NewProject.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
             }
         });
         dialog.show();
