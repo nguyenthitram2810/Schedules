@@ -57,20 +57,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity {
-    private FloatingActionButton btn_add_project;
-    private RecyclerView rv_projects;
-    private ProjectAdapter adapter;
-    private ArrayList<Project> arrProjects;
     private FirebaseAuth auth;
-    private BaseApiService mApiService;
-    private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //mapping();
 
         FirebaseApp.initializeApp(this);
         auth = FirebaseAuth.getInstance();
@@ -105,47 +98,10 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-    public void getData(String email) {
-        mApiService.getAllProjects(email)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Project>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                    }
-
-                    @Override
-                    public void onNext(List<Project> projects) {
-                        arrProjects.removeAll(arrProjects);
-                        for(Project project : projects) {
-                            arrProjects.add(project);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-    }
-
-    private void mapping() {
-        btn_add_project = findViewById(R.id.btn_add_project);
-        rv_projects = findViewById(R.id.list_project);
-        rv_projects.setLayoutManager(new LinearLayoutManager(this));
-        mApiService = UtilsApi.getAPIService();
-        arrProjects = new ArrayList<Project>();
-        adapter = new ProjectAdapter(arrProjects, this);
-        rv_projects.setAdapter(adapter);
-    }
 
     private void checkLogin() {
         if(auth.getCurrentUser() == null){
-            //User da login roi
+            //User signed in
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
     }
@@ -157,56 +113,4 @@ public class MainActivity extends AppCompatActivity {
         AttrAboutPhone.initScreen(this);
         super.onWindowFocusChanged(hasFocus);
     }
-
-    public void onAddProject(View view) {
-        Intent i = new Intent(MainActivity.this, NewProject.class);
-        startActivityForResult(i, REQUEST_CODE_EXAMPLE);
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        this.getData(auth.getCurrentUser().getEmail());
-    }
 }
-
-//    @Override
-//    public void onWindowFocusChanged(boolean hasFocus) {
-//        AttrAboutPhone.saveAttr(this);
-//        AttrAboutPhone.initScreen(this);
-//        super.onWindowFocusChanged(hasFocus);
-//    }
-//
-//    public void onAddProject(View view) {
-//        Intent i = new Intent(MainActivity.this, NewProject.class);
-//        startActivityForResult(i, REQUEST_CODE_EXAMPLE);
-//    }
-//
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//    }
-
-
-
-//    private void getDataAndRefreshView() {
-//        for (int i = 0; i < 3; i++) {
-//            List<DragItem> itemList = new ArrayList<>();
-//            for (int j = 0; j < 5; j++) {
-//                itemList.add(new Item("entry " + i + " item id " + j, "item name " + j, "info " + j));
-//            }
-//            //mData.add(new Entry("entry id " + i, "name " + i, itemList));
-//            mData.add(new Entry("entry 0","Todo",itemList));
-//            mData.add(new Entry("entry 1","Doing",itemList));
-//            mData.add(new Entry("entry 2","Done",itemList));
-//        }
-//        mAdapter.notifyDataSetChanged();
-//    }
-//    private void testExit() {
-//        btnE = findViewById(R.id.exit);
-//        btnE.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                auth.signOut();
-//                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-//            }
-//        });
-//    }

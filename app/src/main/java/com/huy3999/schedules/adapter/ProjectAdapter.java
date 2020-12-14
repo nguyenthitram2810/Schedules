@@ -24,12 +24,17 @@ import com.huy3999.schedules.apiservice.BaseApiService;
 import com.huy3999.schedules.apiservice.UtilsApi;
 import com.huy3999.schedules.model.Project;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.HttpException;
+import retrofit2.Response;
 
 public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHolder> {
     private static ArrayList<Project> arrProjects;
@@ -76,29 +81,26 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
                                 mApiService.deleteProject(arrProjects.get(position).id)
                                         .subscribeOn(Schedulers.newThread())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(new Observer<String>() {
+                                        .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                                             @Override
-                                            public void onSubscribe(Disposable d) {
-
-                                            }
-
-                                            @Override
-                                            public void onNext(String s) {
-
-                                            }
-
-                                            @Override
-                                            public void onError(Throwable e) {
+                                            public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
                                                 arrProjects.remove(position);
                                                 notifyDataSetChanged();
+                                                Toast.makeText(mContext, "Delete successfully", Toast.LENGTH_SHORT).show();
                                             }
 
                                             @Override
-                                            public void onComplete() {
-
+                                            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                                                if (e instanceof HttpException) {
+                                                    HttpException error = (HttpException)e;
+                                                    try {
+                                                        Toast.makeText(mContext, error.response().errorBody().string(), Toast.LENGTH_SHORT).show();
+                                                    } catch (IOException ioException) {
+                                                        ioException.printStackTrace();
+                                                    }
+                                                }
                                             }
                                         });
-                                Toast.makeText(mContext, "Delete successfully", Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         return false;
