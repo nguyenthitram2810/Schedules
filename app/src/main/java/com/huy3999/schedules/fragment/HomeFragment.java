@@ -4,13 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -31,18 +37,21 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private FloatingActionButton addButton;
     private RecyclerView rv_projects;
     private ProjectAdapter adapter;
     private ArrayList<Project> arrProjects;
     private FirebaseAuth auth;
     private BaseApiService mApiService;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private String email;
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private static View root;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.activity_home_fragment, container, false);
+        setHasOptionsMenu(true);
         init();
         return root;
     }
@@ -50,6 +59,7 @@ public class HomeFragment extends Fragment {
 
     public void init() {
         auth = FirebaseAuth.getInstance();
+        email = auth.getCurrentUser().getEmail();
         addButton = root.findViewById(R.id.btn_add_project);
 
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -59,13 +69,13 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
         rv_projects = root.findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(getContext()));
         mApiService = UtilsApi.getAPIService();
         arrProjects = new ArrayList<Project>();
-        adapter = new ProjectAdapter(arrProjects, getContext());
-        rv_projects.setAdapter(adapter);
-        fetchData(auth.getCurrentUser().getEmail());
+        fetchData(email);
+        swipeRefreshLayout.setOnRefreshListener(this::onRefresh);
     }
 
     public void fetchData(String email) {
@@ -79,7 +89,8 @@ public class HomeFragment extends Fragment {
                         for(Project project : projects) {
                             arrProjects.add(project);
                         }
-                        adapter.notifyDataSetChanged();
+                        adapter = new ProjectAdapter(arrProjects, getContext());
+                        rv_projects.setAdapter(adapter);
                     }
 
                     @Override
@@ -97,5 +108,39 @@ public class HomeFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         this.fetchData(auth.getCurrentUser().getEmail());
+    }
+
+
+    @Override
+    public void onRefresh() {
+        fetchData(email);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 3000);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main, menu);
+        MenuItem mSearch = menu.findItem(R.id.menu_search);
+        SearchView mSearchView = (SearchView) mSearch.getActionView();
+        mSearchView.setQueryHint("Search");
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return true;
+            }
+
+        });
     }
 }
