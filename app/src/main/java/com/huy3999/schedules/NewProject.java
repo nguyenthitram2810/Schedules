@@ -320,12 +320,8 @@ public class NewProject extends AppCompatActivity {
                 .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                     @Override
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
-                        try {
-                            Toast.makeText(NewProject.this, response.body().string(), Toast.LENGTH_SHORT).show();
-                            startActivity(intent);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        Toast.makeText(NewProject.this, "Update successfully", Toast.LENGTH_SHORT).show();
+                        startActivity(intent);
                     }
 
                     @Override

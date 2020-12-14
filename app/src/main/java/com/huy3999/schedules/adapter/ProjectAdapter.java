@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.huy3999.schedules.MainActivity;
@@ -24,8 +27,11 @@ import com.huy3999.schedules.apiservice.BaseApiService;
 import com.huy3999.schedules.apiservice.UtilsApi;
 import com.huy3999.schedules.model.Project;
 
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -36,13 +42,16 @@ import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHolder> {
-    private static ArrayList<Project> arrProjects;
-    private static Context mContext;
+public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHolder> implements Filterable {
+    private ArrayList<Project> arrProjects;
+    private ArrayList<Project> arrProjectsAll;
+    private Context mContext;
     private BaseApiService mApiService;
 
     public ProjectAdapter(ArrayList<Project> arrProjects, Context mContext) {
+        Log.d("Constructor", arrProjects.toString());
         this.arrProjects = arrProjects;
+        this.arrProjectsAll = new ArrayList<>(arrProjects);
         this.mContext = mContext;
         mApiService = UtilsApi.getAPIService();
     }
@@ -116,12 +125,46 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
         return arrProjects.size();
     }
 
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    Filter filter = new Filter() {
+        //run on background thread
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            List<Project> filteredList = new ArrayList<>();
+            if(charSequence.toString().isEmpty()) {
+                filteredList.addAll(arrProjectsAll);
+            } else {
+                String filterPattern = charSequence.toString().toLowerCase().trim();
+                for(Project project : arrProjectsAll) {
+                    if(project.name.toLowerCase().contains(filterPattern)) {
+                        filteredList.add(project);
+                    }
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+            return filterResults;
+        }
+        //run on UI thread
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            arrProjects.clear();
+            arrProjects.addAll((Collection<? extends Project>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
         public TextView tvName;
         public TextView tvCollaborators;
         public LinearLayout itemProject;
         public ImageView option;
+        public CardView itemCard;
 
         public MyViewHolder(View view) {
             super(view);
@@ -130,6 +173,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
             tvCollaborators = view.findViewById(R.id.tv_collaborators);
             itemProject = view.findViewById(R.id.item_project);
             option = view.findViewById(R.id.option);
+            itemCard = view.findViewById(R.id.item_card);
         }
     }
 }

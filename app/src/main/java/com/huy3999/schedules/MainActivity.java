@@ -87,11 +87,4 @@ public class MainActivity extends AppCompatActivity{
         AttrAboutPhone.initScreen(this);
         super.onWindowFocusChanged(hasFocus);
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
 }
