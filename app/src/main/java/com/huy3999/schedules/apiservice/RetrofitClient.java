@@ -2,6 +2,9 @@ package com.huy3999.schedules.apiservice;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -16,6 +19,9 @@ public class RetrofitClient {
     public static Retrofit getClient(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
         OkHttpClient client = new OkHttpClient
                 .Builder()
                 .addInterceptor(interceptor)
@@ -26,7 +32,7 @@ public class RetrofitClient {
         if (retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl("http://34.121.239.130/")
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .client(client)
                     .build();
