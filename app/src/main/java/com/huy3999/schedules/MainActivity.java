@@ -160,6 +160,7 @@ public class MainActivity extends AppCompatActivity{
         super.onWindowFocusChanged(hasFocus);
     }
 
+<<<<<<< HEAD
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -168,6 +169,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+=======
+>>>>>>> 24b8a7a5b866f62195f569140870b24d3a06c1cf
     public void onAddProject(View view) {
         Intent i = new Intent(MainActivity.this, NewProject.class);
         startActivityForResult(i, REQUEST_CODE_EXAMPLE);
@@ -196,6 +199,10 @@ public class MainActivity extends AppCompatActivity{
 //        super.onActivityResult(requestCode, resultCode, data);
 //    }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 24b8a7a5b866f62195f569140870b24d3a06c1cf
 
 //    private void getDataAndRefreshView() {
 //        for (int i = 0; i < 3; i++) {
@@ -219,4 +226,8 @@ public class MainActivity extends AppCompatActivity{
 //                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 //            }
 //        });
+<<<<<<< HEAD
 //    }
+=======
+//    }
+>>>>>>> 24b8a7a5b866f62195f569140870b24d3a06c1cf

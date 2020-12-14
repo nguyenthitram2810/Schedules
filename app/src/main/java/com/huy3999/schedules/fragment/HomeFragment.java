@@ -48,9 +48,34 @@ public class HomeFragment extends Fragment {
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private AppBarConfiguration mAppBarConfiguration;
     private static View root;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+<<<<<<< HEAD
         root = inflater.inflate(R.layout.activity_home_fragment, container, false);
+=======
+//        homeViewModel =
+//                new ViewModelProvider(this).get(HomeViewModel.class);
+
+        if (root != null) {
+            ViewGroup parent = (ViewGroup) root.getParent();
+            if (parent != null)
+                parent.removeView(root);
+        }
+        try {
+            root = inflater.inflate(R.layout.activity_home_fragment, container, false);
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
+        }
+//        final TextView textView = root.findViewById(R.id.text_home);
+//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
+        auth = FirebaseAuth.getInstance();
+>>>>>>> 24b8a7a5b866f62195f569140870b24d3a06c1cf
         btn_add_project = root.findViewById(R.id.btn_add_project);
         rv_projects = root.findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -58,6 +83,7 @@ public class HomeFragment extends Fragment {
         arrProjects = new ArrayList<Project>();
         adapter = new ProjectAdapter(arrProjects, getContext());
         rv_projects.setAdapter(adapter);
+        getData(auth.getCurrentUser().getEmail());
         return root;
     }
     public void getData(String email) {

@@ -6,7 +6,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +16,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -33,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.huy3999.dragboardview.utils.AttrAboutPhone;
@@ -43,14 +47,17 @@ import com.huy3999.schedules.model.CreateProjectInfo;
 import com.huy3999.schedules.model.Project;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
-public class NewProject extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class NewProject extends AppCompatActivity {
     private TextView color_project;
     private EditText txt_name;
     private String color_choosed = "";
@@ -58,12 +65,10 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
     private CollaboratorsAdapter adapter;
     private ArrayList<String> arrCollaborators;
     private TextView no_collaborator;
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle toggle;
-    private NavigationView navigationView;
     private BaseApiService mApiService;
     private FirebaseAuth auth;
     private String id = null;
+    private String deletedCollaborator = null;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -79,18 +84,50 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
-        drawerLayout.addDrawerListener(toggle);
         //Add Button Navigation Drawer
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
-        navigationView.setNavigationItemSelectedListener(this);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(rv_collaborators);
     }
 
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            deletedCollaborator = arrCollaborators.get(position);
+            arrCollaborators.remove(position);
+            adapter.notifyItemRemoved(position);
+            no_collaborator.setText(arrCollaborators.size() + " collaborators");
+            Snackbar.make(rv_collaborators, deletedCollaborator, Snackbar.LENGTH_LONG)
+                    .setAction("Undo", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            arrCollaborators.add(position,deletedCollaborator);
+                            adapter.notifyItemInserted(position);
+                            no_collaborator.setText(arrCollaborators.size() + " collaborators");
+                        }
+                    }).show();
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addBackgroundColor(ContextCompat.getColor(NewProject.this, R.color.tomato))
+                    .addActionIcon(R.drawable.ic_baseline_delete_24)
+                    .create()
+                    .decorate();
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+    };
+
     private void mapping() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
         color_project = (TextView) findViewById(R.id.color_project);
         txt_name = (EditText) findViewById(R.id.txt_name);
         rv_collaborators= findViewById(R.id.list_collaborators);
@@ -106,25 +143,6 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
         adapter = new CollaboratorsAdapter(arrCollaborators, this);
         rv_collaborators.setAdapter(adapter);
 
-    }
-
-    @Override
-    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onPostCreate(savedInstanceState, persistentState);
-        toggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        toggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        AttrAboutPhone.saveAttr(this);
-        AttrAboutPhone.initScreen(this);
-        super.onWindowFocusChanged(hasFocus);
     }
 
     @Override
@@ -237,18 +255,13 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
                     no_collaborator.setText(arrCollaborators.size() + " collaborators");
                 }
                 else {
-                    no_collaborator.setText("No collaborators");
+                    no_collaborator.setText("0 collaborators");
                 }
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();
             }
         });
         dialog.show();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
     }
 
     public void getProject(String id) {
