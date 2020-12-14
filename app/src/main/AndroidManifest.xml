@@ -13,12 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
 
-        <activity android:name=".fragment.AccountFragment"></activity>
-        <activity android:name=".fragment.SettingsFragment" />
-        <activity android:name=".fragment.LogoutFragment" />
-        <activity android:name=".fragment.HomeFragment" />
-        <activity android:name=".NewProject" />
-
         <activity android:name=".fragment.HomeFragment" tools:ignore="Instantiatable" />
         <activity android:name=".NewProject" android:parentActivityName=".MainActivity"/>
 
