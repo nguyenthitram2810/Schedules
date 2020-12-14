@@ -17,18 +17,29 @@
         android:layout_width="match_parent"
         android:background="@color/tomato"
         android:layout_height="160dp">
-    <ImageView
-        android:id="@+id/nav_header_imageView"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@mipmap/ic_launcher" />
+        <androidx.cardview.widget.CardView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:elevation="12dp"
+            android:id="@+id/view2"
+            app:cardCornerRadius="40dp"
+            android:layout_centerHorizontal="true"
+            android:innerRadius="0dp"
+            android:shape="ring"
+            android:thicknessRatio="1.9">
+            <ImageView
+                android:id="@+id/nav_header_imageView"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@mipmap/ic_launcher" />
+        </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/nav_header_textView"
+        android:id="@+id/nav_header_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
-        android:text="Truong Dat"
+        android:text="Your name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     </LinearLayout>
 </LinearLayout>

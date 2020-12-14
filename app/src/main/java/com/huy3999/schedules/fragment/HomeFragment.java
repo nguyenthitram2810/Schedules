@@ -47,6 +47,7 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+
     public void init() {
         auth = FirebaseAuth.getInstance();
         addButton = root.findViewById(R.id.btn_add_project);
