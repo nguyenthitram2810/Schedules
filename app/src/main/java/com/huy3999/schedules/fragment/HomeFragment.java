@@ -51,6 +51,9 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+<<<<<<< HEAD
+        root = inflater.inflate(R.layout.activity_home_fragment, container, false);
+=======
 //        homeViewModel =
 //                new ViewModelProvider(this).get(HomeViewModel.class);
 
@@ -72,6 +75,7 @@ public class HomeFragment extends Fragment {
 //            }
 //        });
         auth = FirebaseAuth.getInstance();
+>>>>>>> 24b8a7a5b866f62195f569140870b24d3a06c1cf
         btn_add_project = root.findViewById(R.id.btn_add_project);
         rv_projects = root.findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(getContext()));
