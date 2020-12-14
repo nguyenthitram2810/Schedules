@@ -2,6 +2,7 @@ package com.huy3999.schedules;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,8 +16,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,19 +33,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.huy3999.dragboardview.utils.AttrAboutPhone;
 import com.huy3999.schedules.adapter.CollaboratorsAdapter;
-import com.huy3999.schedules.adapter.ProjectAdapter;
+import com.huy3999.schedules.apiservice.BaseApiService;
+import com.huy3999.schedules.apiservice.UtilsApi;
+import com.huy3999.schedules.model.CreateProjectInfo;
 import com.huy3999.schedules.model.Project;
 
 import java.util.ArrayList;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class NewProject extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private TextView color_project;
     private EditText txt_name;
-    private int color_choosed;
+    private String color_choosed = "";
     private RecyclerView rv_collaborators;
     private CollaboratorsAdapter adapter;
     private ArrayList<String> arrCollaborators;
@@ -50,16 +61,19 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private NavigationView navigationView;
-    public static String Name = "Name";
-    public static String ColorProject = "Color";
-    public static String ListUser = "ListUser";
+    private BaseApiService mApiService;
+    private FirebaseAuth auth;
+    private String id = null;
 
-
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_project);
         mapping();
+
+        FirebaseApp.initializeApp(this);
+        auth = FirebaseAuth.getInstance();
 
         //Create a new toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -81,11 +95,17 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
         txt_name = (EditText) findViewById(R.id.txt_name);
         rv_collaborators= findViewById(R.id.list_collaborators);
         no_collaborator = findViewById(R.id.no_collaborator);
+        mApiService = UtilsApi.getAPIService();
+        if(getIntent().getSerializableExtra("id") != null) {
+            id = getIntent().getSerializableExtra("id").toString();
+            getProject(id);
+        }
 
         rv_collaborators.setLayoutManager(new LinearLayoutManager(this));
         arrCollaborators = new ArrayList<>();
         adapter = new CollaboratorsAdapter(arrCollaborators, this);
         rv_collaborators.setAdapter(adapter);
+
     }
 
     @Override
@@ -118,13 +138,17 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mi_create:
-                if(txt_name.getText().toString().trim().length() != 0 && color_choosed != 0) {
-                    final Intent data = new Intent();
-                    data.putExtra(Name, txt_name.getText().toString());
-                    data.putExtra(ColorProject, color_choosed);
-                    data.putExtra(ListUser, arrCollaborators);
-                    setResult(Activity.RESULT_OK, data);
-                    finish();
+                if(txt_name.getText().toString().trim().length() != 0 && color_choosed != "") {
+                    if(!arrCollaborators.contains(auth.getCurrentUser().getEmail())) {
+                        arrCollaborators.add(auth.getCurrentUser().getEmail());
+                    }
+                    CreateProjectInfo project = new CreateProjectInfo(txt_name.getText().toString().trim(), color_choosed, arrCollaborators);
+                    if(id != null) {
+                        updateProject(project);
+                    }
+                    else {
+                        createProject(project);
+                    }
                 }
                 else {
                     Toast.makeText(this, "Not full information", Toast.LENGTH_SHORT).show();
@@ -143,7 +167,7 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
     public void openColorPicker() {
         final ColorPicker colorPicker = new ColorPicker(this);
         ArrayList<String> colors = new ArrayList<>();
-        colors.add("#258174");
+        colors.add("#ffffff");
         colors.add("#3C8D2F");
         colors.add("#20724f");
         colors.add("#6a3ab2");
@@ -167,7 +191,7 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
                             color_project.setText("");
                         }
                         color_project.setBackgroundColor(color);
-                        color_choosed = color;
+                        color_choosed = colors.get(position);
                     }
 
                     @Override
@@ -225,5 +249,98 @@ public class NewProject extends AppCompatActivity implements NavigationView.OnNa
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
+    }
+
+    public void getProject(String id) {
+        mApiService.getProject(id)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Project>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Project project) {
+                        txt_name.setText(project.name);
+                        arrCollaborators.addAll(project.member);
+                        no_collaborator.setText(arrCollaborators.size() + " collaborators");
+                        color_choosed = project.color;
+                        color_project.setText("");
+                        color_project.setBackgroundColor(Color.parseColor(color_choosed));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("DEBUGE", "Error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    public void createProject(CreateProjectInfo project) {
+        final Intent data = new Intent();
+        mApiService.createProject(project)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d("DEBUGADDSC", "subcrie");
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        Log.d("DEBUGADDSC", "OK");
+                        Toast.makeText(NewProject.this, "Create success", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("DEBUGADDSC", "ERROR");
+                        Toast.makeText(NewProject.this, "Create fail", Toast.LENGTH_SHORT).show();
+                        setResult(Activity.RESULT_OK, data);
+                        finish();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d("DEBUGADDSC", "COMPLETE");
+
+                    }
+                });
+    }
+
+    public void updateProject(CreateProjectInfo project) {
+        final Intent intent = new Intent(this, MainActivity.class);
+        mApiService.updateProject(id, project)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 }

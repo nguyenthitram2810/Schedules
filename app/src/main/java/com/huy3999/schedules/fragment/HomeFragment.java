@@ -50,26 +50,7 @@ public class HomeFragment extends Fragment {
     private static View root;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-//        homeViewModel =
-//                new ViewModelProvider(this).get(HomeViewModel.class);
-
-        if (root != null) {
-            ViewGroup parent = (ViewGroup) root.getParent();
-            if (parent != null)
-                parent.removeView(root);
-        }
-        try {
-            root = inflater.inflate(R.layout.activity_home_fragment, container, false);
-        } catch (InflateException e) {
-            /* map is already there, just return view as it is */
-        }
-//        final TextView textView = root.findViewById(R.id.text_home);
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
+        root = inflater.inflate(R.layout.activity_home_fragment, container, false);
         btn_add_project = root.findViewById(R.id.btn_add_project);
         rv_projects = root.findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(getContext()));
