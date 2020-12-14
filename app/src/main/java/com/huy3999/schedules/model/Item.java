@@ -1,40 +1,32 @@
 package com.huy3999.schedules.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.huy3999.dragboardview.model.DragItem;
 
+import java.util.ArrayList;
+
 public class Item implements DragItem {
-    private String itemId;
-    private String itemName;
+    @SerializedName("id")
+    public final String id;
+    @SerializedName("name")
+    public final String name;
+    @SerializedName("description")
+    public final String description;
+    @SerializedName("state")
+    public final String state;
+    @SerializedName("project_id")
+    public final String project_id;
+    @SerializedName("member")
+    public final ArrayList<String> member;
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
 
-    public void setInfo(String info) {
-        this.info = info;
-    }
-
-    private String info;
-
-    public Item(String itemId, String itemName, String info) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.info = info;
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-    public void setItemName(String itemName){
-        this.itemName = itemName;
+    public Item(String id, String name, String description, String state, String project_id, ArrayList<String> member) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.state = state;
+        this.project_id = project_id;
+        this.member = member;
     }
 
     @Override

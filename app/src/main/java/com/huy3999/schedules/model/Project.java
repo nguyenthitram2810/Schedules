@@ -2,9 +2,10 @@ package com.huy3999.schedules.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Project {
+public class Project implements Serializable {
     @SerializedName("id")
     public final String id;
     @SerializedName("name")

@@ -15,8 +15,6 @@ import com.huy3999.dragboardview.model.DragItem;
 import com.huy3999.schedules.R;
 import com.huy3999.schedules.model.Item;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +45,7 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
                 openDialog(item,position);
             }
         });
-        holder.item_title.setText(((Item) item).getItemName());
+        holder.item_title.setText(((Item) item).name);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -65,17 +63,17 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
         EditText edtItemName = view.findViewById(R.id.edtItemName);
         EditText edtItemDes = view.findViewById(R.id.edtItemDes);
         final AlertDialog alertDialog = builder.create();
-        edtItemName.setText(((Item) item).getItemName());
-        edtItemDes.setText(((Item) item).getInfo());
+        edtItemName.setText(((Item) item).name);
+        edtItemDes.setText(((Item) item).description);
         builder.setMessage("Edit item")
                 .setView(view)
                 .setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
-                            ((Item) item).setItemName(edtItemName.getText().toString().trim());
-                            ((Item) item).setInfo(edtItemDes.getText().toString().trim());
-                            notifyDataSetChanged();
+                            //((Item) item).name = edtItemName.getText().toString().trim();
+                            //((Item) item).setInfo(edtItemDes.getText().toString().trim());
+                            //notifyDataSetChanged();
                         }
 
                     }

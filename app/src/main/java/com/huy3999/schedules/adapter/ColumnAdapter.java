@@ -171,11 +171,8 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
 //                                        "entry " + " item id ",
 //                                        "item name : "+itemName,
 //                                        "info : "+itemDes));
-                            itemList.add(new Item(
-                                    "entry " + " item id ",
-                                    itemName,
-                                    itemDes));
-                                itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
+//                            itemList.add(new Item("111",itemName,itemDes,"TODO","sdf",));
+//                                itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
 
                         }
 

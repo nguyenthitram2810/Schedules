@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -27,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -44,6 +47,7 @@ import com.huy3999.schedules.adapter.ColumnAdapter;
 import com.huy3999.schedules.adapter.ProjectAdapter;
 import com.huy3999.schedules.apiservice.BaseApiService;
 import com.huy3999.schedules.apiservice.UtilsApi;
+import com.huy3999.schedules.fragment.DragBoardFragment;
 import com.huy3999.schedules.model.Project;
 
 import java.util.ArrayList;
@@ -65,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private BaseApiService mApiService;
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private AppBarConfiguration mAppBarConfiguration;
+    Menu menu;
+    int projectItemId = 0;
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,19 +86,57 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        menu = navigationView.getMenu();
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_settings, R.id.nav_logout)
-                .setDrawerLayout(drawer)
-                .build();
+//        mAppBarConfiguration = new AppBarConfiguration.Builder(
+//                R.id.nav_home, R.id.nav_settings, R.id.nav_logout)
+//                .setDrawerLayout(drawer)
+//                .build();
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+//        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+//        NavigationUI.setupWithNavController(navigationView, navController);
+        mApiService = UtilsApi.getAPIService();
+        arrProjects = new ArrayList<Project>();
+        Log.d("project", "email " + auth.getCurrentUser().getEmail());
+        getData(auth.getCurrentUser().getEmail());
+        setupDrawerContent(navigationView);
     }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        if(menuItem.getItemId()!=R.id.nav_home||menuItem.getItemId()!=R.id.nav_settings||menuItem.getItemId()!=R.id.nav_logout) {
+            Project project = arrProjects.get(menuItem.getItemId());
+            try {
+                DragBoardFragment dragBoardFragment = (DragBoardFragment.newInstance(project));
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.nav_host_fragment, dragBoardFragment).commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // Highlight the selected item has been done by NavigationView
+            menuItem.setChecked(true);
+            // Set action bar title
+            setTitle(project.name);
+            Toast.makeText(this, "" + menuItem.getTitle(), Toast.LENGTH_SHORT).show();
+            // Close the navigation drawer
+            drawer.closeDrawers();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -105,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
     public void getData(String email) {
         mApiService.getAllProjects(email)
                 .subscribeOn(Schedulers.newThread())
@@ -117,7 +163,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onNext(List<Project> projects) {
                         arrProjects.removeAll(arrProjects);
-                        for(Project project : projects) {
+                        for (Project project : projects) {
+                            Log.d("project", "project: " + project.name);
                             arrProjects.add(project);
                         }
                     }
@@ -128,7 +175,18 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        adapter.notifyDataSetChanged();
+                        //adapter.notifyDataSetChanged();
+                        if (arrProjects != null) {
+                            Log.d("project", "email " + auth.getCurrentUser().getEmail());
+                            Log.d("project", "projects " + String.valueOf(arrProjects));
+                            final SubMenu subMenu = menu.addSubMenu("Projects");
+                            for (Project project : arrProjects) {
+                                menu.add(0, projectItemId, 0, project.name);
+                                //subMenu.add(0, projectItemId, 0, project.name);
+                                projectItemId++;
+                                //menu.add(project.name);
+                            }
+                        }
                     }
                 });
     }
@@ -144,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkLogin() {
-        if(auth.getCurrentUser() == null){
+        if (auth.getCurrentUser() == null) {
             //User da login roi
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
@@ -184,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 //    }
-
 
 
 //    private void getDataAndRefreshView() {
