@@ -1,4 +1,4 @@
-package com.huy3999.dragboardview;
+package com.huy3999.schedules.dragboardview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,8 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.huy3999.dragboardview.adapter.RecyclerViewPagerAdapter;
-import com.huy3999.dragboardview.utils.RecyclerviewUtils;
+import com.huy3999.schedules.dragboardview.adapter.RecyclerViewPagerAdapter;
+import com.huy3999.schedules.dragboardview.utils.RecyclerviewUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -61,10 +61,10 @@ public class PagerRecyclerView extends RecyclerView {
     }
 
     private void initAttrs(Context context, AttributeSet attrs, int defStyle) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RecyclerViewPager, defStyle, 0);
-        mFlingFactor = a.getFloat(R.styleable.RecyclerViewPager_flingFactor, 0.15f);
-        mTriggerOffset = a.getFloat(R.styleable.RecyclerViewPager_triggerOffset, 0.25f);
-        mSinglePageFling = a.getBoolean(R.styleable.RecyclerViewPager_singlePageFling, mSinglePageFling);
+        TypedArray a = context.obtainStyledAttributes(attrs, com.huy3999.schedules.R.styleable.RecyclerViewPager, defStyle, 0);
+        mFlingFactor = a.getFloat(com.huy3999.schedules.R.styleable.RecyclerViewPager_flingFactor, 0.15f);
+        mTriggerOffset = a.getFloat(com.huy3999.schedules.R.styleable.RecyclerViewPager_triggerOffset, 0.25f);
+        mSinglePageFling = a.getBoolean(com.huy3999.schedules.R.styleable.RecyclerViewPager_singlePageFling, mSinglePageFling);
         a.recycle();
     }
 

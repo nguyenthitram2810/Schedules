@@ -1,4 +1,4 @@
-package com.huy3999.dragboardview.model;
+package com.huy3999.schedules.dragboardview.model;
 
 import androidx.annotation.IntRange;
 

@@ -1,4 +1,4 @@
-package com.huy3999.dragboardview.helper;
+package com.huy3999.schedules.dragboardview.helper;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,13 +12,13 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.huy3999.dragboardview.PagerRecyclerView;
-import com.huy3999.dragboardview.callback.DragHorizontalAdapter;
-import com.huy3999.dragboardview.callback.DragHorizontalViewHolder;
-import com.huy3999.dragboardview.callback.DragVerticalAdapter;
-import com.huy3999.dragboardview.model.DragColumn;
-import com.huy3999.dragboardview.model.DragItem;
-import com.huy3999.dragboardview.utils.AttrAboutPhone;
+import com.huy3999.schedules.dragboardview.PagerRecyclerView;
+import com.huy3999.schedules.dragboardview.callback.DragHorizontalAdapter;
+import com.huy3999.schedules.dragboardview.callback.DragHorizontalViewHolder;
+import com.huy3999.schedules.dragboardview.callback.DragVerticalAdapter;
+import com.huy3999.schedules.dragboardview.model.DragColumn;
+import com.huy3999.schedules.dragboardview.model.DragItem;
+import com.huy3999.schedules.dragboardview.utils.AttrAboutPhone;
 
 import java.util.Timer;
 import java.util.TimerTask;

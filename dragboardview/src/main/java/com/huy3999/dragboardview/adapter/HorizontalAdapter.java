@@ -9,6 +9,8 @@ import com.huy3999.dragboardview.callback.DragHorizontalAdapter;
 import com.huy3999.dragboardview.callback.DragHorizontalViewHolder;
 import com.huy3999.dragboardview.helper.DragHelper;
 import com.huy3999.dragboardview.model.DragColumn;
+import com.huy3999.schedules.apiservice.BaseApiService;
+import com.huy3999.schedules.model.Project;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,10 +31,17 @@ public abstract class HorizontalAdapter<VH extends HorizontalAdapter.ViewHolder>
 
     private int mDragPosition;
     private boolean mHideDragItem;
+    BaseApiService mApiService;
+    Project project;
 
-    public HorizontalAdapter(Context context) {
+    public HorizontalAdapter(Context context, BaseApiService mApiService, Project project) {
         this.mContext = context;
+        this.mApiService = mApiService;
+        this.project = project;
     }
+//    public HorizontalAdapter(Context context) {
+//        this.mContext = context;
+//    }
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {

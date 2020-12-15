@@ -1,7 +1,8 @@
-package com.huy3999.dragboardview.callback;
+package com.huy3999.schedules.dragboardview.callback;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
+
 public interface DragHorizontalViewHolder {
     /**
      * each Horizontal ViewHolder is supposed to have a RecycleView

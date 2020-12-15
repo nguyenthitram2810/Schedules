@@ -1,6 +1,7 @@
-package com.huy3999.dragboardview.callback;
+package com.huy3999.schedules.dragboardview.callback;
 
-import com.huy3999.dragboardview.model.DragItem;
+import com.huy3999.schedules.dragboardview.model.DragItem;
+
 public interface DragVerticalAdapter {
     /**
      * call if on dragItem item

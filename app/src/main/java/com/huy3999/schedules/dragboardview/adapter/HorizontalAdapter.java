@@ -1,15 +1,16 @@
-package com.huy3999.dragboardview.adapter;
+package com.huy3999.schedules.dragboardview.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.huy3999.dragboardview.callback.DragHorizontalAdapter;
-import com.huy3999.dragboardview.callback.DragHorizontalViewHolder;
-import com.huy3999.dragboardview.helper.DragHelper;
-import com.huy3999.dragboardview.model.DragColumn;
 import com.huy3999.schedules.apiservice.BaseApiService;
+import com.huy3999.schedules.dragboardview.callback.DragHorizontalAdapter;
+import com.huy3999.schedules.dragboardview.callback.DragHorizontalViewHolder;
+import com.huy3999.schedules.dragboardview.helper.DragHelper;
+import com.huy3999.schedules.dragboardview.model.DragColumn;
 import com.huy3999.schedules.model.Project;
 
 import java.util.Collections;
@@ -18,8 +19,8 @@ import java.util.List;
 import androidx.annotation.IntRange;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.huy3999.dragboardview.helper.DragHelper.TYPE_CONTENT;
-import static com.huy3999.dragboardview.helper.DragHelper.TYPE_FOOTER;
+import static com.huy3999.schedules.dragboardview.helper.DragHelper.TYPE_CONTENT;
+import static com.huy3999.schedules.dragboardview.helper.DragHelper.TYPE_FOOTER;
 
 public abstract class HorizontalAdapter<VH extends HorizontalAdapter.ViewHolder>
         extends RecyclerView.Adapter<VH>
@@ -39,9 +40,6 @@ public abstract class HorizontalAdapter<VH extends HorizontalAdapter.ViewHolder>
         this.mApiService = mApiService;
         this.project = project;
     }
-//    public HorizontalAdapter(Context context) {
-//        this.mContext = context;
-//    }
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -128,6 +126,7 @@ public abstract class HorizontalAdapter<VH extends HorizontalAdapter.ViewHolder>
     @Override
     public void updateDragItemVisibility(int position) {
         if (mDragPosition >= 0 && mDragPosition < mData.size() && position < mData.size() && mDragPosition != position) {
+            Log.d("position","drag: "+position);
             if (Math.abs(mDragPosition - position) == 1) {
                 notifyItemChanged(mDragPosition);
                 Collections.swap(mData, mDragPosition, position);

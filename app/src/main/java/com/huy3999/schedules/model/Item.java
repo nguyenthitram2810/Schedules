@@ -1,7 +1,7 @@
 package com.huy3999.schedules.model;
 
 import com.google.gson.annotations.SerializedName;
-import com.huy3999.dragboardview.model.DragItem;
+import com.huy3999.schedules.dragboardview.model.DragItem;
 
 import java.util.ArrayList;
 

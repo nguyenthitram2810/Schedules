@@ -1,4 +1,4 @@
-package com.huy3999.dragboardview.adapter;
+package com.huy3999.schedules.dragboardview.adapter;
 import android.view.View;
 import android.view.ViewGroup;
 

@@ -1,6 +1,7 @@
-package com.huy3999.dragboardview.callback;
+package com.huy3999.schedules.dragboardview.callback;
 
-import com.huy3999.dragboardview.model.DragColumn;
+import com.huy3999.schedules.dragboardview.model.DragColumn;
+
 public interface DragHorizontalAdapter {
     void onDrag(int position);
 

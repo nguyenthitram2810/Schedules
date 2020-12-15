@@ -1,6 +1,7 @@
 package com.huy3999.schedules.apiservice;
 
 import com.huy3999.schedules.model.CreateProjectInfo;
+import com.huy3999.schedules.model.CreateTaskInfo;
 import com.huy3999.schedules.model.Item;
 import com.huy3999.schedules.model.Project;
 
@@ -32,4 +33,6 @@ public interface BaseApiService {
     Observable<Project> getProject(@Path("id") String id);
     @GET("tasks/getTasksScreen/{id}")
     Observable<List<Item>> getTaskByState(@Path("id") String id,@Query("state") String state);
+    @POST("tasks")
+    Observable<String> createTask(@Body CreateTaskInfo task);
 }

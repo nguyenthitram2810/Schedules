@@ -8,11 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.huy3999.dragboardview.adapter.VerticalAdapter;
-import com.huy3999.dragboardview.helper.DragHelper;
-import com.huy3999.dragboardview.model.DragItem;
 import com.huy3999.schedules.R;
+import com.huy3999.schedules.dragboardview.adapter.VerticalAdapter;
+import com.huy3999.schedules.dragboardview.helper.DragHelper;
+import com.huy3999.schedules.dragboardview.model.DragItem;
 import com.huy3999.schedules.model.Item;
 
 import androidx.annotation.NonNull;

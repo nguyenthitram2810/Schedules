@@ -1,4 +1,4 @@
-package com.huy3999.dragboardview.utils;
+package com.huy3999.schedules.dragboardview.utils;
 
 import android.app.Activity;
 import android.content.Context;

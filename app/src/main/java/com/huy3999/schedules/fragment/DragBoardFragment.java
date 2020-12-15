@@ -14,9 +14,9 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.huy3999.dragboardview.DragBoardView;
-import com.huy3999.dragboardview.model.DragColumn;
-import com.huy3999.dragboardview.model.DragItem;
+import com.huy3999.schedules.dragboardview.DragBoardView;
+import com.huy3999.schedules.dragboardview.model.DragColumn;
+import com.huy3999.schedules.dragboardview.model.DragItem;
 import com.huy3999.schedules.R;
 import com.huy3999.schedules.adapter.ColumnAdapter;
 import com.huy3999.schedules.apiservice.BaseApiService;
@@ -27,15 +27,18 @@ import com.huy3999.schedules.model.Project;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DragBoardFragment extends Fragment {
+    private static final String TODO = "Todo";
+    private static final String DOING = "Doing";
+    private static final String DONE = "Done";
     private BaseApiService mApiService;
     private ColumnAdapter mAdapter;
     DragBoardView dragBoardView;
     private Project project;
     private List<DragColumn> mData = new ArrayList<>();
-    private static final String ARG_DATA = "data";
     private static final String ARG_PROJECT = "project";
     List<DragItem> todoList;
     List<DragItem> doingList;
@@ -48,7 +51,6 @@ public class DragBoardFragment extends Fragment {
         DragBoardFragment fragment = new DragBoardFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PROJECT, (Serializable) project);
-        //args.putSerializable(ARG_DATA, (Serializable) data);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,7 +60,6 @@ public class DragBoardFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             project = (Project) getArguments().getSerializable(ARG_PROJECT);
-            //mData = (List<DragColumn>) getArguments().getSerializable(ARG_DATA);
         }
     }
 
@@ -68,18 +69,14 @@ public class DragBoardFragment extends Fragment {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_drag_board, container, false);
         dragBoardView = view.findViewById(R.id.drag_board);
-        mAdapter = new ColumnAdapter(getContext());
         mApiService = UtilsApi.getAPIService();
+        mAdapter = new ColumnAdapter(getContext(),mApiService,project);
+        mAdapter.setData(mData);
+        dragBoardView.setHorizontalAdapter(mAdapter);
         todoList = new ArrayList<>();
-        Log.d("project","id: "+project.id);
-        //getData("Todo");
-//        for (int j = 0; j < 5; j++) {
-//                todoList.add(new Item(""+j,"name "+j,"sdf","Todo","fsd",null));
-//            }
+        getData(TODO);
         doingList = new ArrayList<>();
         doneList = new ArrayList<>();
-        getData("Done");
-
         return view;
     }
     public void getData(String state) {
@@ -106,13 +103,24 @@ public class DragBoardFragment extends Fragment {
 
                     @Override
                     public void onComplete() {
-                        doneList = items;
-                        mData.add(new Entry("0","Todo",todoList));
-                        mData.add(new Entry("1","Doing",doingList));
-                        mData.add(new Entry("2","Done",doneList));
-                        Log.d("data",doneList.get(0).toString());
-                        mAdapter.setData(mData);
-                        dragBoardView.setHorizontalAdapter(mAdapter);
+                        if(state==TODO){
+                            todoList = items;
+                            mData.add(new Entry("0","Todo",todoList));
+                            mAdapter.notifyDataSetChanged();
+                            getData(DOING);
+                        }
+                        if(state == DOING){
+                            doingList = items;
+                            mData.add(new Entry("2","Doing",doingList));
+                            mAdapter.notifyDataSetChanged();
+                            getData(DONE);
+                        }
+                        if(state == DONE){
+                            doneList = items;
+                            mData.add(new Entry("3","Done",doneList));
+                            mAdapter.notifyDataSetChanged();
+                        }
+
                     }
                 });
     }

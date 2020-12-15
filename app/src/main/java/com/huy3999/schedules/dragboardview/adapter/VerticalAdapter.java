@@ -1,12 +1,12 @@
-package com.huy3999.dragboardview.adapter;
+package com.huy3999.schedules.dragboardview.adapter;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.huy3999.dragboardview.callback.DragVerticalAdapter;
-import com.huy3999.dragboardview.helper.DragHelper;
-import com.huy3999.dragboardview.model.DragItem;
+import com.huy3999.schedules.dragboardview.callback.DragVerticalAdapter;
+import com.huy3999.schedules.dragboardview.helper.DragHelper;
+import com.huy3999.schedules.dragboardview.model.DragItem;
 
 import java.util.ArrayList;
 import java.util.Collections;

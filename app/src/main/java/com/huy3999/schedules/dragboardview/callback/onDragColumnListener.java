@@ -1,4 +1,4 @@
-package com.huy3999.dragboardview.callback;
+package com.huy3999.schedules.dragboardview.callback;
 
 import android.view.MotionEvent;
 import android.view.View;

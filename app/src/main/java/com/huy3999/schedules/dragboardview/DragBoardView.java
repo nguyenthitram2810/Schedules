@@ -1,11 +1,11 @@
-package com.huy3999.dragboardview;
+package com.huy3999.schedules.dragboardview;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.huy3999.dragboardview.adapter.HorizontalAdapter;
-import com.huy3999.dragboardview.helper.DragHelper;
+import com.huy3999.schedules.dragboardview.adapter.HorizontalAdapter;
+import com.huy3999.schedules.dragboardview.helper.DragHelper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,9 +38,9 @@ public class DragBoardView extends DragLayout {
     }
 
     private void init(Context context) {
-        inflate(context, R.layout.view_drag_board, this);
-        mLayoutMain = (DragLayout) findViewById(R.id.layout_main);
-        mRecyclerView = (PagerRecyclerView) findViewById(R.id.rv_lists);
+        inflate(context, com.huy3999.schedules.R.layout.view_drag_board, this);
+        mLayoutMain = (DragLayout) findViewById(com.huy3999.schedules.R.id.layout_main);
+        mRecyclerView = (PagerRecyclerView) findViewById(com.huy3999.schedules.R.id.rv_lists);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -86,7 +86,7 @@ public class DragBoardView extends DragLayout {
             }
         }
     };
-    private View.OnLayoutChangeListener mOnLayoutChangedListener = new View.OnLayoutChangeListener() {
+    private OnLayoutChangeListener mOnLayoutChangedListener = new OnLayoutChangeListener() {
         @Override
         public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
         }

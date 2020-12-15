@@ -1,11 +1,11 @@
-package com.huy3999.dragboardview;
+package com.huy3999.schedules.dragboardview;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
-import com.huy3999.dragboardview.helper.DragHelper;
+import com.huy3999.schedules.dragboardview.helper.DragHelper;
 
 public class DragLayout extends RelativeLayout {
 
