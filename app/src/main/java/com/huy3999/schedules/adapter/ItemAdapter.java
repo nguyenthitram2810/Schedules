@@ -1,12 +1,20 @@
 package com.huy3999.schedules.adapter;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,37 +85,86 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
     }
     private void openDialog(DragItem item,final int position){
         mApiService = UtilsApi.getAPIService();
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_item, null);
-        //View view = getLayoutInflater().inflate(R.layout.test, null);
-        EditText edtItemName = view.findViewById(R.id.edtItemName);
-        EditText edtItemDes = view.findViewById(R.id.edtItemDes);
-        final AlertDialog alertDialog = builder.create();
-        edtItemName.setText(((Item) item).name);
-        edtItemDes.setText(((Item) item).description);
-        builder.setMessage("Edit item")
-                .setView(view)
-                .setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
-                            ((Item) item).name = edtItemName.getText().toString().trim();
-                            ((Item) item).description = edtItemDes.getText().toString().trim();
+        final Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_dialog_task);
+        Window window = dialog.getWindow();
+        if(window == null) {
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        WindowManager.LayoutParams windowAtrributes = window.getAttributes();
+        windowAtrributes.gravity = Gravity.CENTER;
+        window.setAttributes(windowAtrributes);
+        dialog.setCancelable(false);
+        EditText name = dialog.findViewById(R.id.name_task);
+        EditText description = dialog.findViewById(R.id.description_task);
+        Button btnCancel = dialog.findViewById(R.id.btn_cancel);
+        Button btnAdd = dialog.findViewById(R.id.btn_ok);
+        TextView title = dialog.findViewById(R.id.title_dialog);
+
+        //set data dialog
+        btnAdd.setText("Update");
+        title.setText("Update Task");
+        name.setText(((Item) item).name);
+        description.setText(((Item) item).description);
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
+                    if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
+                            ((Item) item).name = name.getText().toString().trim();
+                            ((Item) item).description = description.getText().toString().trim();
                             CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).id,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
                             //updateTask(((Item) item).id,taskInfo);
                             notifyDataSetChanged();
 
                         }
-
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        alertDialog.dismiss();
-                    }
-                });
-        builder.show();
+                }
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+//        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_item, null);
+//        //View view = getLayoutInflater().inflate(R.layout.test, null);
+//        EditText edtItemName = view.findViewById(R.id.edtItemName);
+//        EditText edtItemDes = view.findViewById(R.id.edtItemDes);
+//        final AlertDialog alertDialog = builder.create();
+//        edtItemName.setText(((Item) item).name);
+//        edtItemDes.setText(((Item) item).description);
+//        builder.setMessage("Edit item")
+//                .setView(view)
+//                .setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
+//                            ((Item) item).name = edtItemName.getText().toString().trim();
+//                            ((Item) item).description = edtItemDes.getText().toString().trim();
+//                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).id,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
+//                            //updateTask(((Item) item).id,taskInfo);
+//                            notifyDataSetChanged();
+//
+//                        }
+//
+//                    }
+//                })
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        alertDialog.dismiss();
+//                    }
+//                });
+//        builder.show();
     }
     public void updateTask(String id, CreateTaskInfo task) {
         mApiService.updateTask(id, task)
