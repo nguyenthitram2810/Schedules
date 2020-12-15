@@ -106,32 +106,29 @@ public class DragBoardFragment extends Fragment {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mData.clear();
+                //mData.clear();
                 List<Item> itemList = new ArrayList<>();
-                itemList = db.itemDao().loadAllItemByState(TODO);
+                itemList = db.itemDao().loadAllItemByState(project.id,TODO);
                 for (Item item : itemList) {
                     if (item.member.contains(email)) {
                         todoList.add(item);
                     }
                 }
                 itemList.clear();
-                itemList = db.itemDao().loadAllItemByState(DOING);
+                itemList = db.itemDao().loadAllItemByState(project.id,DOING);
                 for (Item item : itemList) {
                     if (item.member.contains(email)) {
                         doingList.add(item);
                     }
                 }
                 itemList.clear();
-                itemList = db.itemDao().loadAllItemByState(DONE);
+                itemList = db.itemDao().loadAllItemByState(project.id,DONE);
                 for (Item item : itemList) {
                     if (item.member.contains(email)) {
                         doneList.add(item);
                     }
                 }
                 itemList.clear();
-                mData.add(new Entry("0", "Todo", todoList));
-                mData.add(new Entry("1", "Doing", doingList));
-                mData.add(new Entry("2", "Done", doneList));
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -183,6 +180,8 @@ public class DragBoardFragment extends Fragment {
                         }
                         if (state == DOING) {
                             getData(DONE);
+                        }if(state == DONE){
+                            getDataFromCache();
                         }
 
                     }

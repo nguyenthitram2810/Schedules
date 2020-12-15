@@ -17,8 +17,8 @@ public interface ItemDao {
     @Query("SELECT * FROM item")
     List<Item> loadAllItems();
 
-    @Query("SELECT * FROM item WHERE  state = :state")
-    List<Item> loadAllItemByState( String state);
+    @Query("SELECT * FROM item WHERE project_id = :project_id AND state = :state")
+    List<Item> loadAllItemByState(String project_id, String state);
     @Query("DELETE FROM item")
     public void clear();
     @Insert(onConflict = OnConflictStrategy.REPLACE)
