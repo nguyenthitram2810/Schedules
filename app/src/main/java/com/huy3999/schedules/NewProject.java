@@ -30,6 +30,7 @@ import com.huy3999.schedules.apiservice.UtilsApi;
 import com.huy3999.schedules.model.CreateProjectInfo;
 import com.huy3999.schedules.model.Project;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -46,9 +47,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+import okhttp3.ResponseBody;
 import petrov.kristiyan.colorpicker.ColorPicker;
+import retrofit2.HttpException;
+import retrofit2.Response;
 
 public class NewProject extends AppCompatActivity {
     private TextView color_project;
@@ -62,6 +67,7 @@ public class NewProject extends AppCompatActivity {
     private FirebaseAuth auth;
     private String id = null;
     private String deletedCollaborator = null;
+    private String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -126,6 +132,7 @@ public class NewProject extends AppCompatActivity {
         rv_collaborators= findViewById(R.id.list_collaborators);
         no_collaborator = findViewById(R.id.no_collaborator);
         mApiService = UtilsApi.getAPIService();
+
         if(getIntent().getSerializableExtra("id") != null) {
             id = getIntent().getSerializableExtra("id").toString();
             getProject(id);
@@ -135,7 +142,6 @@ public class NewProject extends AppCompatActivity {
         arrCollaborators = new ArrayList<>();
         adapter = new CollaboratorsAdapter(arrCollaborators, this);
         rv_collaborators.setAdapter(adapter);
-
     }
 
     @Override
@@ -163,7 +169,6 @@ public class NewProject extends AppCompatActivity {
                 }
                 else {
                     Toast.makeText(this, "Not full information", Toast.LENGTH_SHORT).show();
-//                    CustomToast.makeText(NewProject.this, "Error", CustomToast.LONG, CustomToast.SUCCESS,true).show();
                 }
                 return true;
             default:
@@ -179,15 +184,15 @@ public class NewProject extends AppCompatActivity {
         final ColorPicker colorPicker = new ColorPicker(this);
         ArrayList<String> colors = new ArrayList<>();
         colors.add("#ffffff");
-        colors.add("#3C8D2F");
-        colors.add("#20724f");
-        colors.add("#6a3ab2");
-        colors.add("#323299");
-        colors.add("#800080");
-        colors.add("#b79716");
-        colors.add("#966d37");
-        colors.add("#b77231");
-        colors.add("#808000");
+        colors.add("#F27171");
+        colors.add("#FACACA");
+        colors.add("#92D5D4");
+        colors.add("#8CAACA");
+        colors.add("#F5E472");
+        colors.add("#9897A3");
+        colors.add("#B99175");
+        colors.add("#E93C44");
+        colors.add("#6BC06F");
 
         colorPicker.setColors(colors)
                 .setColumns(5)
@@ -195,14 +200,11 @@ public class NewProject extends AppCompatActivity {
                 .setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
                     @Override
                     public void onChooseColor(int position, int color) {
-                        if(color == 0) {
-                            color_project.setText("No color");
-                        }
-                        else {
+                        if(color != 0) {
                             color_project.setText("");
+                            color_project.setBackgroundColor(color);
+                            color_choosed = colors.get(position);
                         }
-                        color_project.setBackgroundColor(color);
-                        color_choosed = colors.get(position);
                     }
 
                     @Override
@@ -242,16 +244,22 @@ public class NewProject extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(NewProject.this, add_colla.getText().toString(), Toast.LENGTH_SHORT).show();
-                arrCollaborators.add(add_colla.getText().toString());
-                if(arrCollaborators.size() > 0) {
-                    no_collaborator.setText(arrCollaborators.size() + " collaborators");
+                try {
+                    String email = add_colla.getText().toString().trim();
+
+                    if(email.equals(auth.getCurrentUser().getEmail())) throw new Exception("You can not invite yourself");
+                    if(!email.matches(emailPattern)) throw new Exception("Email is invalid");
+                    if(!email.isEmpty()) {
+                        arrCollaborators.add(email);
+                        no_collaborator.setText(arrCollaborators.size() + " collaborators");
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    dialog.dismiss();
                 }
-                else {
-                    no_collaborator.setText("0 collaborators");
+                catch (Exception e) {
+                    Toast.makeText(NewProject.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
             }
         });
         dialog.show();
@@ -261,14 +269,9 @@ public class NewProject extends AppCompatActivity {
         mApiService.getProject(id)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Project>() {
+                .subscribeWith(new DisposableSingleObserver<Project>() {
                     @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(Project project) {
+                    public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Project project) {
                         txt_name.setText(project.name);
                         arrCollaborators.addAll(project.member);
                         no_collaborator.setText(arrCollaborators.size() + " collaborators");
@@ -278,46 +281,31 @@ public class NewProject extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.d("DEBUGE", "Error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        Toast.makeText(NewProject.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     public void createProject(CreateProjectInfo project) {
-        final Intent data = new Intent();
         mApiService.createProject(project)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
+                .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                     @Override
-                    public void onSubscribe(Disposable d) {
-                        Log.d("DEBUGADDSC", "subcrie");
+                    public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
+                        try {
+                            Toast.makeText(NewProject.this, response.body().string(), Toast.LENGTH_SHORT).show();
+                            setResult(Activity.RESULT_OK);
+                            finish();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
-                    public void onNext(String s) {
-                        Log.d("DEBUGADDSC", "OK");
-                        Toast.makeText(NewProject.this, "Create success", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d("DEBUGADDSC", "ERROR");
-                        Toast.makeText(NewProject.this, "Create fail", Toast.LENGTH_SHORT).show();
-                        setResult(Activity.RESULT_OK, data);
-                        finish();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.d("DEBUGADDSC", "COMPLETE");
-
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        Log.d("ERROR", e.getMessage());
                     }
                 });
     }
@@ -327,25 +315,23 @@ public class NewProject extends AppCompatActivity {
         mApiService.updateProject(id, project)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
+                .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                     @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(String s) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
+                    public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
+                        Toast.makeText(NewProject.this, "Update successfully", Toast.LENGTH_SHORT).show();
                         startActivity(intent);
                     }
 
                     @Override
-                    public void onComplete() {
-
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        if (e instanceof HttpException) {
+                            HttpException error = (HttpException)e;
+                            try {
+                                Toast.makeText(NewProject.this, error.response().errorBody().string(), Toast.LENGTH_SHORT).show();
+                            } catch (IOException ioException) {
+                                ioException.printStackTrace();
+                            }
+                        }
                     }
                 });
     }

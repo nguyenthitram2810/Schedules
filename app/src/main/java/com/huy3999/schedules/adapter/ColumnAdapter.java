@@ -231,33 +231,7 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
                     }
                 });
     }
-    //public void updateProject(CreateProjectInfo project) {
-//            final Intent intent = new Intent(this, MainActivity.class);
-//            mApiService.updateProject(id, project)
-//                    .subscribeOn(Schedulers.newThread())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(new Observer<String>() {
-//                        @Override
-//                        public void onSubscribe(Disposable d) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onNext(String s) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//                            startActivity(intent);
-//                        }
-//
-//                        @Override
-//                        public void onComplete() {
-//
-//                        }
-//                    });
-//        }
+
 
 
 }

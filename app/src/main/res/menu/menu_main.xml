@@ -5,10 +5,7 @@
     <item android:title="Search"
         android:id="@+id/menu_search"
         android:icon="@drawable/ic_baseline_search_24"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom|withText"
+        app:actionViewClass="android.widget.SearchView"
         />
-    <item android:title="Setting"
-        android:name="com.huy3999.schedules.fragment.SettingsFragment"
-        android:label="Settings"
-        tools:layout="@layout/activity_settings_fragment"/>
 </menu>

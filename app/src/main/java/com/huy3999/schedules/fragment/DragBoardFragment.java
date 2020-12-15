@@ -50,7 +50,7 @@ public class DragBoardFragment extends Fragment {
     public static DragBoardFragment newInstance(Project project) {
         DragBoardFragment fragment = new DragBoardFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PROJECT, (Serializable) project);
+        args.putParcelable(ARG_PROJECT,project);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,7 +59,7 @@ public class DragBoardFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            project = (Project) getArguments().getSerializable(ARG_PROJECT);
+            project = (Project) getArguments().getParcelable(ARG_PROJECT);
         }
     }
 
@@ -72,6 +72,7 @@ public class DragBoardFragment extends Fragment {
         mApiService = UtilsApi.getAPIService();
         mAdapter = new ColumnAdapter(getContext(),mApiService,project);
         mAdapter.setData(mData);
+        getActivity().setTitle(project.name);
         dragBoardView.setHorizontalAdapter(mAdapter);
         todoList = new ArrayList<>();
         getData(TODO);

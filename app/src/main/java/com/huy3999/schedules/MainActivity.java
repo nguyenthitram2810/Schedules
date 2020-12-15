@@ -88,4 +88,5 @@ public class MainActivity extends AppCompatActivity{
         AttrAboutPhone.initScreen(this);
         super.onWindowFocusChanged(hasFocus);
     }
+
 }

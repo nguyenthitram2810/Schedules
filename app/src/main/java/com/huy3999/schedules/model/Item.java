@@ -9,9 +9,9 @@ public class Item implements DragItem {
     @SerializedName("id")
     public final String id;
     @SerializedName("name")
-    public final String name;
+    public String name;
     @SerializedName("description")
-    public final String description;
+    public String description;
     @SerializedName("state")
     public final String state;
     @SerializedName("project_id")
