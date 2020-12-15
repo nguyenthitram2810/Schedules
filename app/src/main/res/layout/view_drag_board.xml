@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.huy3999.dragboardview.DragLayout
+<com.huy3999.schedules.dragboardview.DragLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.huy3999.dragboardview.PagerRecyclerView
+    <com.huy3999.schedules.dragboardview.PagerRecyclerView
         android:id="@+id/rv_lists"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,4 +17,4 @@
         app:singlePageFling="true"
         app:triggerOffset="0.1"/>
 
-</com.huy3999.dragboardview.DragLayout>
+</com.huy3999.schedules.dragboardview.DragLayout>

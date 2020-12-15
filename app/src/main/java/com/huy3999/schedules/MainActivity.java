@@ -1,3 +1,4 @@
+
 package com.huy3999.schedules;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +19,7 @@ import android.widget.TextView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.huy3999.dragboardview.utils.AttrAboutPhone;
+import com.huy3999.schedules.dragboardview.utils.AttrAboutPhone;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity{
@@ -87,4 +88,5 @@ public class MainActivity extends AppCompatActivity{
         AttrAboutPhone.initScreen(this);
         super.onWindowFocusChanged(hasFocus);
     }
+
 }
