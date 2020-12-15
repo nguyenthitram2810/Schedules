@@ -74,4 +74,7 @@ dependencies {
 
     //refresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    //Change Theme
+    implementation 'com.github.akndmr:ColorPrefUtil:1.0.1'
 }
