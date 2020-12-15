@@ -1,13 +1,19 @@
 package com.huy3999.schedules.adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -95,35 +101,49 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
         holder.add_task.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_item, null);
-                EditText edtItemName = view.findViewById(R.id.edtItemName);
-                EditText edtItemDes = view.findViewById(R.id.edtItemDes);
-                final AlertDialog alertDialog = builder.create();
-                builder.setMessage("Add item")
-                        .setView(view)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
-                                    itemName = edtItemName.getText().toString().trim();
-                                    itemDes = edtItemDes.getText().toString().trim();
-                                    CreateTaskInfo taskInfo = new CreateTaskInfo(itemName,itemDes,entry.getName(),project.id,project.member);
-                                    Log.d("create task", "proj id: "+project.id+ "state: "+ entry.getName()+" name: "+itemName);
-                                    itemList.add(new Item("1",itemName,itemDes,entry.getName(),project.id,project.member));
-                                    itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
-                                    createTask(taskInfo);
-                                    holder.tv_title_count.setText(""+itemList.size());
-                                }
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                alertDialog.dismiss();
-                            }
-                        });
-                builder.show();
+                final Dialog dialog = new Dialog(mContext);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.layout_dialog_task);
+                Window window = dialog.getWindow();
+                if(window == null) {
+                    return;
+                }
+                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                WindowManager.LayoutParams windowAtrributes = window.getAttributes();
+                windowAtrributes.gravity = Gravity.CENTER;
+                window.setAttributes(windowAtrributes);
+                dialog.setCancelable(false);
+                EditText name = dialog.findViewById(R.id.name_task);
+                EditText description = dialog.findViewById(R.id.description_task);
+                Button btnCancel = dialog.findViewById(R.id.btn_cancel);
+                Button btnAdd = dialog.findViewById(R.id.btn_ok);
+                TextView title = dialog.findViewById(R.id.title_dialog);
+                btnAdd.setText("Add");
+                title.setText("Add Task");
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                btnAdd.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
+                            itemName = name.getText().toString().trim();
+                            itemDes = description.getText().toString().trim();
+                            CreateTaskInfo taskInfo = new CreateTaskInfo(itemName,itemDes,entry.getName(),project.id,project.member);
+                            Log.d("create task", "proj id: "+project.id+ "state: "+ entry.getName()+" name: "+itemName);
+                            itemList.add(new Item("1",itemName,itemDes,entry.getName(),project.id,project.member));
+                            itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
+                            createTask(taskInfo);
+                            holder.tv_title_count.setText(""+itemList.size());
+                        }
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
             }
         });
     }
