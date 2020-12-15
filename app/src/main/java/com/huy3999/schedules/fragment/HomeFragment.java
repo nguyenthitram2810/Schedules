@@ -125,7 +125,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
     @Override
     public void onRefresh() {
         fetchData(email);
