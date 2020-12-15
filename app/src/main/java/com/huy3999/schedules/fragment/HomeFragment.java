@@ -61,7 +61,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private String email;
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private static View root;
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.activity_home_fragment, container, false);
         setHasOptionsMenu(true);
