@@ -92,7 +92,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     public void fetchData(String email) {
-        progressBar.setVisibility(View.VISIBLE);
         mApiService.getAllProjects(email)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -105,7 +104,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         }
                         adapter = new ProjectAdapter(arrProjects, getContext());
                         rv_projects.setAdapter(adapter);
-                        progressBar.setVisibility(View.GONE);
                     }
 
                     @Override

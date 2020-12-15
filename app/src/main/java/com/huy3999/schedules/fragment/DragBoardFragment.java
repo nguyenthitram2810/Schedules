@@ -160,14 +160,12 @@ public class DragBoardFragment extends Fragment {
                     @Override
                     public void onNext(List<Item> itemList) {
                         for (Item item : itemList) {
-                            //items.add(item);
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {
                                     db.itemDao().insertItem(item);
                                 }
                             });
-
                         }
                     }
 
