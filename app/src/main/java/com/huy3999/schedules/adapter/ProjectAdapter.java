@@ -84,7 +84,9 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.view:
-                                Toast.makeText(mContext, "view", Toast.LENGTH_SHORT).show();
+                                DragBoardFragment dragBoardFragment = (DragBoardFragment.newInstance(arrProjects.get(position)));
+                                FragmentManager manager = ((AppCompatActivity)mContext).getSupportFragmentManager();
+                                manager.beginTransaction().replace(R.id.nav_host_fragment, dragBoardFragment).commit();
                                 break;
                             case R.id.edit:
                                 Intent intent = new Intent(mContext, NewProject.class);
