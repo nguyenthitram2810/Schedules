@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Project implements Parcelable {
     @SerializedName("id")
@@ -54,5 +55,15 @@ public class Project implements Parcelable {
         dest.writeString(name);
         dest.writeString(color);
         dest.writeStringList(member);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        boolean isEqual= false;
+        if (object != null && object instanceof Project)
+        {
+            isEqual = (this.id == ((Project) object).id);
+        }
+        return isEqual;
     }
 }

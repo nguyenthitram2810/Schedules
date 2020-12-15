@@ -242,12 +242,14 @@ public class NewProject extends AppCompatActivity {
         EditText add_colla = dialog.findViewById(R.id.add_email);
         Button btnCancel = dialog.findViewById(R.id.btn_cancel);
         Button btnAdd = dialog.findViewById(R.id.btn_add);
+
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
             }
         });
+
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

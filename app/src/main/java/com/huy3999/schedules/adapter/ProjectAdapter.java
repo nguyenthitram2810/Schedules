@@ -48,6 +48,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
     private Context mContext;
     private BaseApiService mApiService;
 
+
     public ProjectAdapter(ArrayList<Project> arrProjects, Context mContext) {
         Log.d("Constructor", arrProjects.toString());
         this.arrProjects = arrProjects;
@@ -93,8 +94,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
                                         .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                                             @Override
                                             public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
-                                                arrProjects.remove(position);
-                                                notifyDataSetChanged();
+
                                                 Toast.makeText(mContext, "Delete successfully", Toast.LENGTH_SHORT).show();
                                             }
 
