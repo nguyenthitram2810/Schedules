@@ -3,6 +3,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -67,6 +68,8 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
         final Entry entry = (Entry) dragColumn;
         holder.tv_title.setText(entry.getName());
         List<DragItem> itemList = entry.getItemList();
+        Log.d("count",""+itemList.size());
+        holder.tv_title_count.setText(""+itemList.size());
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         holder.rv_item.setLayoutManager(layoutManager);
         ItemAdapter itemAdapter = new ItemAdapter(mContext, dragHelper);
@@ -115,7 +118,7 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
 
         RelativeLayout col_content_container;
         ImageView title_icon;
-        TextView tv_title;
+        TextView tv_title, tv_title_count;
         RecyclerView rv_item;
         RelativeLayout add_task;
 
@@ -139,6 +142,7 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
             col_content_container = convertView.findViewById(R.id.col_content_container);
             title_icon = convertView.findViewById(R.id.title_icon);
             tv_title = convertView.findViewById(R.id.tv_title);
+            tv_title_count = convertView.findViewById(R.id.tv_title_count);
             rv_item = convertView.findViewById(R.id.rv);
             add_task = convertView.findViewById(R.id.add);
         }

@@ -32,6 +32,8 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -49,6 +51,7 @@ import com.huy3999.schedules.apiservice.BaseApiService;
 import com.huy3999.schedules.apiservice.UtilsApi;
 import com.huy3999.schedules.fragment.DragBoardFragment;
 import com.huy3999.schedules.model.Project;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +63,7 @@ import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private FloatingActionButton btn_add_project;
     private RecyclerView rv_projects;
     private ProjectAdapter adapter;
@@ -71,40 +74,48 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     Menu menu;
     int projectItemId = 0;
-    DrawerLayout drawer;
+    private NavigationView navigationView;
+    private TextView navHeaderUsername;
+    private View header;
+    private String TAG = "oke";
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //mapping();
 
         FirebaseApp.initializeApp(this);
         auth = FirebaseAuth.getInstance();
         checkLogin();
+        drawer = findViewById(R.id.drawer_layout);
+
+        //Information on header of DrawerLayout
+        navigationView = findViewById(R.id.nav_view);
+        header = navigationView.getHeaderView(0);
+        navHeaderUsername = header.findViewById(R.id.nav_header_username);
+        ImageView imageView = header.findViewById(R.id.nav_header_imageView);
+        Log.d(TAG, "onCreate: " + auth.getCurrentUser().getPhotoUrl());
+        Picasso.with(this).load(auth.getCurrentUser().getPhotoUrl().toString()).into(imageView);
+        navHeaderUsername.setText(auth.getCurrentUser().getDisplayName());
+
+        //Click on One item on DrawerNavigation
+        Menu menuDrawer = navigationView.getMenu();
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        menu = navigationView.getMenu();
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-//        mAppBarConfiguration = new AppBarConfiguration.Builder(
-//                R.id.nav_home, R.id.nav_settings, R.id.nav_logout)
-//                .setDrawerLayout(drawer)
-//                .build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_settings, R.id.nav_logout)
+                .setDrawerLayout(drawer)
+                .build();
 
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-//        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-//        NavigationUI.setupWithNavController(navigationView, navController);
-        mApiService = UtilsApi.getAPIService();
-        arrProjects = new ArrayList<Project>();
-        Log.d("project", "email " + auth.getCurrentUser().getEmail());
-        getData(auth.getCurrentUser().getEmail());
-        setupDrawerContent(navigationView);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
     }
+
 
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
@@ -116,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
     public void selectDrawerItem(MenuItem menuItem) {
         if(menuItem.getItemId()!=R.id.nav_home||menuItem.getItemId()!=R.id.nav_settings||menuItem.getItemId()!=R.id.nav_logout) {
             Project project = arrProjects.get(menuItem.getItemId());
@@ -191,15 +201,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void mapping() {
-        btn_add_project = findViewById(R.id.btn_add_project);
-        rv_projects = findViewById(R.id.list_project);
-        rv_projects.setLayoutManager(new LinearLayoutManager(this));
-        mApiService = UtilsApi.getAPIService();
-        arrProjects = new ArrayList<Project>();
-        adapter = new ProjectAdapter(arrProjects, this);
-        rv_projects.setAdapter(adapter);
-    }
 
     private void checkLogin() {
         if (auth.getCurrentUser() == null) {
@@ -225,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         this.getData(auth.getCurrentUser().getEmail());
     }
+
 }
 
 //    @Override
@@ -242,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 //    }
-
 
 //    private void getDataAndRefreshView() {
 //        for (int i = 0; i < 3; i++) {
@@ -266,4 +267,5 @@ public class MainActivity extends AppCompatActivity {
 //                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 //            }
 //        });
+//    }
 //    }

@@ -1,5 +1,6 @@
 package com.huy3999.schedules.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.huy3999.schedules.MainActivity;
@@ -22,6 +25,7 @@ import com.huy3999.schedules.NewProject;
 import com.huy3999.schedules.R;
 import com.huy3999.schedules.apiservice.BaseApiService;
 import com.huy3999.schedules.apiservice.UtilsApi;
+import com.huy3999.schedules.fragment.DragBoardFragment;
 import com.huy3999.schedules.model.Project;
 
 import java.util.ArrayList;
@@ -98,7 +102,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
 
                                             }
                                         });
-                                Toast.makeText(mContext, "delete", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Delete successfully", Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         return false;
@@ -106,6 +110,13 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
                 });
                 popupMenu.show();
             }
+        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DragBoardFragment dragBoardFragment = (DragBoardFragment.newInstance(arrProjects.get(position)));
+                FragmentManager manager = ((AppCompatActivity)mContext).getSupportFragmentManager();
+                manager.beginTransaction().replace(R.id.nav_host_fragment, dragBoardFragment).commit(); }
         });
     }
 

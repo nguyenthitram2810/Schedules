@@ -13,6 +13,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface BaseApiService {
     @GET("projects/getProjectEmail/{email}")
@@ -29,6 +30,6 @@ public interface BaseApiService {
 
     @GET("projects/getProject/{id}")
     Observable<Project> getProject(@Path("id") String id);
-    @GET("task/getTasksScreen/{id}?state={state}")
-    Observable<List<Item>> getTaskByState(@Path("id") String id, @Path("state") String state);
+    @GET("tasks/getTasksScreen/{id}")
+    Observable<List<Item>> getTaskByState(@Path("id") String id,@Query("state") String state);
 }

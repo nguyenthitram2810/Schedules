@@ -38,7 +38,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class HomeFragment extends Fragment {
 
-//    private HomeViewModel homeViewModel;
+    //    private HomeViewModel homeViewModel;
     private FloatingActionButton btn_add_project;
     private RecyclerView rv_projects;
     private ProjectAdapter adapter;
@@ -48,6 +48,7 @@ public class HomeFragment extends Fragment {
     private static final int REQUEST_CODE_EXAMPLE = 0x9345;
     private AppBarConfiguration mAppBarConfiguration;
     private static View root;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 //        homeViewModel =
@@ -70,13 +71,15 @@ public class HomeFragment extends Fragment {
 //                textView.setText(s);
 //            }
 //        });
-        btn_add_project = root.findViewById(R.id.btn_add_project);
+        auth = FirebaseAuth.getInstance();
+                btn_add_project = root.findViewById(R.id.btn_add_project);
         rv_projects = root.findViewById(R.id.list_project);
         rv_projects.setLayoutManager(new LinearLayoutManager(getContext()));
         mApiService = UtilsApi.getAPIService();
         arrProjects = new ArrayList<Project>();
         adapter = new ProjectAdapter(arrProjects, getContext());
         rv_projects.setAdapter(adapter);
+        getData(auth.getCurrentUser().getEmail());
         return root;
     }
     public void getData(String email) {

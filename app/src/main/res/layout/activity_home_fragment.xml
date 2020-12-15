@@ -10,7 +10,7 @@
         android:id="@+id/list_project"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp">
+        android:paddingTop="20dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -19,6 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:onClick="onAddProject"
         app:backgroundTint="@color/tomato"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
