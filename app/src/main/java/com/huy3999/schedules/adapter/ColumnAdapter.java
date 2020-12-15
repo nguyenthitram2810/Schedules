@@ -233,7 +233,6 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
     }
 
 
-
 }
 
 
