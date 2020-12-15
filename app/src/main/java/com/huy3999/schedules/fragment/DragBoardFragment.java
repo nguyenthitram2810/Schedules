@@ -129,7 +129,6 @@ public class DragBoardFragment extends Fragment {
                     }
                 }
                 itemList.clear();
-                Log.d("todo------------", todoList.get(0).toString());
                 mData.add(new Entry("0", "Todo", todoList));
                 mData.add(new Entry("1", "Doing", doingList));
                 mData.add(new Entry("2", "Done", doneList));
@@ -166,7 +165,6 @@ public class DragBoardFragment extends Fragment {
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Log.d("item-------------------", "" + item.name);
                                     db.itemDao().insertItem(item);
                                 }
                             });
@@ -181,21 +179,10 @@ public class DragBoardFragment extends Fragment {
                     @Override
                     public void onComplete() {
                         if (state == TODO) {
-//                            todoList = items;
-//                            mData.add(new Entry("0","Todo",todoList));
-//                            mAdapter.notifyDataSetChanged();
                             getData(DOING);
                         }
                         if (state == DOING) {
-//                            doingList = items;
-//                            mData.add(new Entry("2","Doing",doingList));
-//                            mAdapter.notifyDataSetChanged();
                             getData(DONE);
-                        }
-                        if (state == DONE) {
-//                            doneList = items;
-//                            mData.add(new Entry("3","Done",doneList));
-//                            mAdapter.notifyDataSetChanged();
                         }
 
                     }

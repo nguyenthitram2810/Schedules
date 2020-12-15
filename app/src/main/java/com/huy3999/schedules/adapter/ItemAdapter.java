@@ -30,6 +30,8 @@ import com.huy3999.schedules.dragboardview.model.DragItem;
 import com.huy3999.schedules.model.CreateProjectInfo;
 import com.huy3999.schedules.model.CreateTaskInfo;
 import com.huy3999.schedules.model.Item;
+import com.huy3999.schedules.roomcache.AppDatabase;
+import com.huy3999.schedules.roomcache.AppExecutors;
 
 import java.io.IOException;
 import java.util.Observable;
@@ -47,6 +49,8 @@ import retrofit2.Response;
 
 public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
     BaseApiService mApiService;
+    AppDatabase db;
+
     public ItemAdapter(Context context, DragHelper dragHelper) {
         super(context, dragHelper);
     }
@@ -69,7 +73,7 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openDialog(item,position);
+                openDialog(item, position);
             }
         });
         holder.item_title.setText(((Item) item).name);
@@ -83,13 +87,15 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
             item_title = itemView.findViewById(R.id.item_title);
         }
     }
-    private void openDialog(DragItem item,final int position){
+
+    private void openDialog(DragItem item, final int position) {
+        db = AppDatabase.getInstance(mContext);
         mApiService = UtilsApi.getAPIService();
         final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_dialog_task);
         Window window = dialog.getWindow();
-        if(window == null) {
+        if (window == null) {
             return;
         }
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
@@ -120,52 +126,28 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
-                    if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
-                            ((Item) item).name = name.getText().toString().trim();
-                            ((Item) item).description = description.getText().toString().trim();
-                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).name,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
-                            updateTask(((Item) item).id,taskInfo);
-
-                            notifyDataSetChanged();
-                        }
+                if (!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")) {
+                    if (!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")) {
+                        ((Item) item).name = name.getText().toString().trim();
+                        ((Item) item).description = description.getText().toString().trim();
+                        CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).name, ((Item) item).description, ((Item) item).state, ((Item) item).project_id, ((Item) item).member);
+                        updateTask(((Item) item).id, taskInfo);
+                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d("item", "updated" + ((Item) item).name);
+                                db.itemDao().insertItem((Item) item);
+                            }
+                        });
+                        notifyDataSetChanged();
+                    }
                 }
                 dialog.dismiss();
             }
         });
         dialog.show();
-//        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_item, null);
-//        //View view = getLayoutInflater().inflate(R.layout.test, null);
-//        EditText edtItemName = view.findViewById(R.id.edtItemName);
-//        EditText edtItemDes = view.findViewById(R.id.edtItemDes);
-//        final AlertDialog alertDialog = builder.create();
-//        edtItemName.setText(((Item) item).name);
-//        edtItemDes.setText(((Item) item).description);
-//        builder.setMessage("Edit item")
-//                .setView(view)
-//                .setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
-//                            ((Item) item).name = edtItemName.getText().toString().trim();
-//                            ((Item) item).description = edtItemDes.getText().toString().trim();
-//                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).id,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
-//                            //updateTask(((Item) item).id,taskInfo);
-//                            notifyDataSetChanged();
-//
-//                        }
-//
-//                    }
-//                })
-//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        alertDialog.dismiss();
-//                    }
-//                });
-//        builder.show();
     }
+
     public void updateTask(String id, CreateTaskInfo task) {
         mApiService.updateTask(id, task)
                 .subscribeOn(Schedulers.newThread())
@@ -173,13 +155,13 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
                 .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                     @Override
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
-                            Log.d("update", "update success");
+                        Log.d("update", "update success");
                     }
 
                     @Override
                     public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
                         if (e instanceof HttpException) {
-                            HttpException error = (HttpException)e;
+                            HttpException error = (HttpException) e;
                             try {
                                 Toast.makeText(mContext, error.response().errorBody().string(), Toast.LENGTH_SHORT).show();
                             } catch (IOException ioException) {
