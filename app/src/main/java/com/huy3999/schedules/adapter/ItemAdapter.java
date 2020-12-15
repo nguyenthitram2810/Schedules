@@ -124,49 +124,18 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
                     if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
                             ((Item) item).name = name.getText().toString().trim();
                             ((Item) item).description = description.getText().toString().trim();
-                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).id,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
-                            //updateTask(((Item) item).id,taskInfo);
+                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).name,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
+                            updateTask(((Item) item).id,taskInfo);
                             notifyDataSetChanged();
-
                         }
                 }
                 dialog.dismiss();
             }
         });
         dialog.show();
-//        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_item, null);
-//        //View view = getLayoutInflater().inflate(R.layout.test, null);
-//        EditText edtItemName = view.findViewById(R.id.edtItemName);
-//        EditText edtItemDes = view.findViewById(R.id.edtItemDes);
-//        final AlertDialog alertDialog = builder.create();
-//        edtItemName.setText(((Item) item).name);
-//        edtItemDes.setText(((Item) item).description);
-//        builder.setMessage("Edit item")
-//                .setView(view)
-//                .setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        if(!edtItemName.getText().toString().trim().equals("") && !edtItemDes.getText().toString().trim().equals("")){
-//                            ((Item) item).name = edtItemName.getText().toString().trim();
-//                            ((Item) item).description = edtItemDes.getText().toString().trim();
-//                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).id,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
-//                            //updateTask(((Item) item).id,taskInfo);
-//                            notifyDataSetChanged();
-//
-//                        }
-//
-//                    }
-//                })
-//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        alertDialog.dismiss();
-//                    }
-//                });
-//        builder.show();
     }
     public void updateTask(String id, CreateTaskInfo task) {
+        Log.d("updateTask", id);
         mApiService.updateTask(id, task)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

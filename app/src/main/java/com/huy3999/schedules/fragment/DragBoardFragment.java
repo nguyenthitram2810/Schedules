@@ -94,7 +94,7 @@ public class DragBoardFragment extends Fragment {
                     public void onNext(List<Item> itemList) {
                         for (Item item : itemList) {
                             items.add(item);
-                            Log.d("item",""+item.name);
+                            Log.d("item",""+item.id);
                         }
                     }
 
