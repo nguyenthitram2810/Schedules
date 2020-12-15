@@ -124,10 +124,10 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
                     if(!name.getText().toString().trim().equals("") && !description.getText().toString().trim().equals("")){
                             ((Item) item).name = name.getText().toString().trim();
                             ((Item) item).description = description.getText().toString().trim();
-                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).id,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
-                            //updateTask(((Item) item).id,taskInfo);
-                            notifyDataSetChanged();
+                            CreateTaskInfo taskInfo = new CreateTaskInfo(((Item) item).name,((Item) item).description,((Item) item).state,((Item) item).project_id,((Item) item).member);
+                            updateTask(((Item) item).id,taskInfo);
 
+                            notifyDataSetChanged();
                         }
                 }
                 dialog.dismiss();
@@ -173,7 +173,7 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
                 .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                     @Override
                     public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
-
+                            Log.d("update", "update success");
                     }
 
                     @Override
