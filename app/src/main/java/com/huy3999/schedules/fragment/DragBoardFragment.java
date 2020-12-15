@@ -2,6 +2,7 @@ package com.huy3999.schedules.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -14,6 +15,13 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.huy3999.schedules.adapter.ProjectAdapter;
 import com.huy3999.schedules.dragboardview.DragBoardView;
 import com.huy3999.schedules.dragboardview.model.DragColumn;
 import com.huy3999.schedules.dragboardview.model.DragItem;
@@ -24,6 +32,8 @@ import com.huy3999.schedules.apiservice.UtilsApi;
 import com.huy3999.schedules.model.Entry;
 import com.huy3999.schedules.model.Item;
 import com.huy3999.schedules.model.Project;
+import com.huy3999.schedules.roomcache.AppDatabase;
+import com.huy3999.schedules.roomcache.AppExecutors;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,6 +53,10 @@ public class DragBoardFragment extends Fragment {
     List<DragItem> todoList;
     List<DragItem> doingList;
     List<DragItem> doneList;
+    private String email;
+    private FirebaseAuth auth;
+    AppDatabase db;
+
     public DragBoardFragment() {
         // Required empty public constructor
     }
@@ -50,7 +64,7 @@ public class DragBoardFragment extends Fragment {
     public static DragBoardFragment newInstance(Project project) {
         DragBoardFragment fragment = new DragBoardFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_PROJECT,project);
+        args.putParcelable(ARG_PROJECT, project);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,22 +81,73 @@ public class DragBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_drag_board, container, false);
+        View view = inflater.inflate(R.layout.fragment_drag_board, container, false);
         dragBoardView = view.findViewById(R.id.drag_board);
+        db = AppDatabase.getInstance(getContext());
         mApiService = UtilsApi.getAPIService();
-        mAdapter = new ColumnAdapter(getContext(),mApiService,project);
+        auth = FirebaseAuth.getInstance();
+        email = auth.getCurrentUser().getEmail();
+        mAdapter = new ColumnAdapter(getContext(), mApiService, project);
+        todoList = new ArrayList<>();
+        doingList = new ArrayList<>();
+        doneList = new ArrayList<>();
+        mData.add(new Entry("0", "Todo", todoList));
+        mData.add(new Entry("1", "Doing", doingList));
+        mData.add(new Entry("2", "Done", doneList));
         mAdapter.setData(mData);
         getActivity().setTitle(project.name);
         dragBoardView.setHorizontalAdapter(mAdapter);
-        todoList = new ArrayList<>();
+        getDataFromCache();
         getData(TODO);
-        doingList = new ArrayList<>();
-        doneList = new ArrayList<>();
         return view;
     }
+
+    public void getDataFromCache() {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                //mData.clear();
+                List<Item> itemList = new ArrayList<>();
+                itemList = db.itemDao().loadAllItemByState(project.id,TODO);
+                for (Item item : itemList) {
+                    if (item.member.contains(email)) {
+                        todoList.add(item);
+                    }
+                }
+                itemList.clear();
+                itemList = db.itemDao().loadAllItemByState(project.id,DOING);
+                for (Item item : itemList) {
+                    if (item.member.contains(email)) {
+                        doingList.add(item);
+                    }
+                }
+                itemList.clear();
+                itemList = db.itemDao().loadAllItemByState(project.id,DONE);
+                for (Item item : itemList) {
+                    if (item.member.contains(email)) {
+                        doneList.add(item);
+                    }
+                }
+                itemList.clear();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dragBoardView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                });
+
+            }
+        });
+    }
+
     public void getData(String state) {
-        List<DragItem> items = new ArrayList<>();
-        mApiService.getTaskByState(project.id,state)
+        //List<DragItem> items = new ArrayList<>();
+        mApiService.getTaskByState(project.id, state)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<Item>>() {
@@ -93,8 +158,14 @@ public class DragBoardFragment extends Fragment {
                     @Override
                     public void onNext(List<Item> itemList) {
                         for (Item item : itemList) {
-                            items.add(item);
-                            Log.d("item",""+item.name);
+                            //items.add(item);
+                            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    db.itemDao().insertItem(item);
+                                }
+                            });
+
                         }
                     }
 
@@ -104,25 +175,17 @@ public class DragBoardFragment extends Fragment {
 
                     @Override
                     public void onComplete() {
-                        if(state==TODO){
-                            todoList = items;
-                            mData.add(new Entry("0","Todo",todoList));
-                            mAdapter.notifyDataSetChanged();
+                        if (state == TODO) {
                             getData(DOING);
                         }
-                        if(state == DOING){
-                            doingList = items;
-                            mData.add(new Entry("2","Doing",doingList));
-                            mAdapter.notifyDataSetChanged();
+                        if (state == DOING) {
                             getData(DONE);
-                        }
-                        if(state == DONE){
-                            doneList = items;
-                            mData.add(new Entry("3","Done",doneList));
-                            mAdapter.notifyDataSetChanged();
+                        }if(state == DONE){
+                            getDataFromCache();
                         }
 
                     }
                 });
     }
+
 }
