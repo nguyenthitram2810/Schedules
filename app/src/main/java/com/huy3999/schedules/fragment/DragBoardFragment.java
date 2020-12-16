@@ -167,7 +167,6 @@ public class DragBoardFragment extends Fragment {
                                     db.itemDao().insertItem(item);
                                 }
                             });
-
                         }
                     }
 
