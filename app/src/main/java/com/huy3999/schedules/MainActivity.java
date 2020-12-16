@@ -53,14 +53,17 @@ public class MainActivity extends AppCompatActivity{
         header = navigationView.getHeaderView(0);
         navHeaderUsername = header.findViewById(R.id.nav_header_username);
         ImageView imageView = header.findViewById(R.id.nav_header_imageView);
-        Log.d(TAG, "onCreate: " + auth.getCurrentUser().getPhotoUrl());
+//        Log.d(TAG, "onCreate: " + auth.getCurrentUser().getPhotoUrl());
         Picasso.with(this).load(auth.getCurrentUser().getPhotoUrl().toString()).into(imageView);
         navHeaderUsername.setText(auth.getCurrentUser().getDisplayName());
 
         //init
         SharedPreferences mSettings = getSharedPreferences(PREFS_NAME, 0);
         //get
-        colorApp = mSettings.getString(DATA_TAG, "");
+        if(mSettings.getString(DATA_TAG, "") != "")
+            colorApp = mSettings.getString(DATA_TAG, "");
+        else
+            colorApp = "#F44336";
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         View header = navigationView.getHeaderView(0);
