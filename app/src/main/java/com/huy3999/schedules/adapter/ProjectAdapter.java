@@ -100,7 +100,6 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.MyViewHo
                                         .subscribeWith(new DisposableSingleObserver<Response<ResponseBody>>() {
                                             @Override
                                             public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull Response<ResponseBody> response) {
-
                                                 Toast.makeText(mContext, "Delete successfully", Toast.LENGTH_SHORT).show();
                                             }
 

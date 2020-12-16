@@ -149,6 +149,7 @@ public class ItemAdapter extends VerticalAdapter<ItemAdapter.ViewHolder> {
     }
 
     public void updateTask(String id, CreateTaskInfo task) {
+        Log.d("updateTask", id);
         mApiService.updateTask(id, task)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

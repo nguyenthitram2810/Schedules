@@ -3,6 +3,7 @@ package com.huy3999.schedules.fragment;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -96,6 +97,7 @@ public class DragBoardFragment extends Fragment {
         mData.add(new Entry("2", "Done", doneList));
         mAdapter.setData(mData);
         getActivity().setTitle(project.name);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(project.name);
         dragBoardView.setHorizontalAdapter(mAdapter);
         getDataFromCache();
         getData(TODO);
@@ -158,14 +160,12 @@ public class DragBoardFragment extends Fragment {
                     @Override
                     public void onNext(List<Item> itemList) {
                         for (Item item : itemList) {
-                            //items.add(item);
                             AppExecutors.getInstance().diskIO().execute(new Runnable() {
                                 @Override
                                 public void run() {
                                     db.itemDao().insertItem(item);
                                 }
                             });
-
                         }
                     }
 
@@ -181,6 +181,9 @@ public class DragBoardFragment extends Fragment {
                         if (state == DOING) {
                             getData(DONE);
                         }if(state == DONE){
+                            todoList.clear();
+                            doingList.clear();
+                            doneList.clear();
                             getDataFromCache();
                         }
 
