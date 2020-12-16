@@ -33,6 +33,8 @@ import com.huy3999.schedules.model.CreateTaskInfo;
 import com.huy3999.schedules.model.Entry;
 import com.huy3999.schedules.model.Item;
 import com.huy3999.schedules.model.Project;
+import com.huy3999.schedules.roomcache.AppDatabase;
+import com.huy3999.schedules.roomcache.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,7 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
     BaseApiService mApiService;
     Project project;
     String itemName, itemDes;
+    AppDatabase db;
     public ColumnAdapter(Context context, BaseApiService mApiService, Project project) {
         super(context,mApiService,project);
         this.mApiService = mApiService;
@@ -88,7 +91,7 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
                 return true;
             }
         });
-
+        db = AppDatabase.getInstance(mContext);
         final Entry entry = (Entry) dragColumn;
         holder.tv_title.setText(entry.getName());
         final List<DragItem> itemList = entry.getItemList();
@@ -135,8 +138,16 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
                             itemDes = description.getText().toString().trim();
                             CreateTaskInfo taskInfo = new CreateTaskInfo(itemName,itemDes,entry.getName(),project.id,project.member);
                             Log.d("create task", "proj id: "+project.id+ "state: "+ entry.getName()+" name: "+itemName);
-                            itemList.add(new Item("1",itemName,itemDes,entry.getName(),project.id,project.member));
+                            Item item = new Item("1",itemName,itemDes,entry.getName(),project.id,project.member);
+                            itemList.add(item);
                             itemAdapter.notifyItemInserted(itemAdapter.getItemCount() - 1);
+                            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.d("item", "inserted" + item.name);
+                                    db.itemDao().insertItem(item);
+                                }
+                            });
                             createTask(taskInfo);
                             holder.tv_title_count.setText(""+itemList.size());
                         }
@@ -251,7 +262,6 @@ public class ColumnAdapter extends HorizontalAdapter<ColumnAdapter.ViewHolder>  
                     }
                 });
     }
-
 
 
 }
